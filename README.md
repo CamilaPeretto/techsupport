@@ -128,8 +128,6 @@ O integrante do grupo gera o link e compartilha com os demais
 Todos podem editar simultaneamente e testar em tempo real
 
 ## Equipe
-Nome	Função	GitHub
-Camila	Full-Stack	@Camila
 
 | Nome | Função | Github
 |----------|------------|------------|
