@@ -2,7 +2,7 @@ import React from "react";
 import DashboardLayout from "../components/layout/DashboardLayout";
 
 const DashboardTest = () => {
-  const role = "user"; // "user" ou "tech"
+  const role = "tech"; // "user" ou "tech"
 
   return (
     <DashboardLayout role={role}>

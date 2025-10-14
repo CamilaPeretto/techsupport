@@ -131,7 +131,7 @@ Todos podem editar simultaneamente e testar em tempo real
 
 | Nome | Função | Github
 |----------|------------|------------|
-| Augusto | Front-End | ... |
+| Augusto | Front-End | AugustoReich |
 | Lukka | Front-End | ... |
 | Jonathan | Back-End | ... |
 | Camila | Full-Stack | CamilaPeretto |
