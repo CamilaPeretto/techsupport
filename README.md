@@ -35,20 +35,64 @@ Plataforma web para abertura e gerenciamento de **chamados técnicos**, permitin
 ##  Estrutura de Pastas
 ```
 techsupport/
-├── backend/
-│ ├── src/
-│ │ ├── config/
-│ │ ├── controllers/
-│ │ ├── models/
-│ │ └── routes/
-│ ├── .env
-│ ├── package.json
-│ └── server.js
-├── frontend/
-│ ├── src/
-│ ├── public/
-│ ├── package.json
-│ └── vite.config.js
+│    ├── backend/
+│    │   ├── src/
+│    │   │   ├── config/
+│    │   │   ├── db.js                      
+│    │   │   └── rateLimit.js               
+│    │   │
+│    │   ├── middleware/
+│    │   │   ├── authMiddleware.js          
+│    │   │   ├── errorHandler.js           
+│    │   │   └── validateRequest.js         
+│    │   │
+│    │   ├── models/
+│    │   │   ├── User.js
+│    │   │   ├── Ticket.js
+│    │   │   └── Log.js
+│    │   │
+│    │   ├── controllers/
+│    │   │   ├── authController.js
+│    │   │   ├── ticketController.js
+│    │   │   └── userController.js
+│    │   │
+│    │   ├── routes/
+│    │   │   ├── authRoutes.js
+│    │   │   ├── ticketRoutes.js
+│    │   │   └── userRoutes.js
+│    │   │
+│    │   ├── utils/
+│    │   │   ├── generateToken.js
+│    │   │   ├── logger.js
+│    │   │   └── validators.js
+│    │   │
+│    │   ├── app.js                         
+│    │   └── server.js                     
+│    │   │
+│    │   └── package.json
+│    │
+│    │
+│    ├──frontend/
+│    │
+│    ├── src/
+│    │   ├── components/
+│    │   │   └── layout/
+│    │   │       ├── Header.jsx
+│    │   │       ├── Sidebar.jsx
+│    │   │       └── DashboardLayout.jsx
+│    │   │
+│    │   ├── pages/
+│    │   │   └── DashboardTest.jsx
+│    │   │
+│    │   ├── App.css
+│    │   ├── App.jsx
+│    │   ├── main.jsx
+│    │   └── index.css
+│    │
+│    ├── index.html                              
+│    ├── package.json
+│    └── vite.config.js
+│
 ├── .eslintrc.json
 ├── .prettierrc
 ├── package.json
@@ -100,40 +144,13 @@ JWT_SECRET=um_token_secreto_seguro
 
 ---
 
-##  Contribuindo
-
-1. Faça um **fork** do repositório  
-2. Crie uma **branch** para sua feature  
-   ```
-   git checkout -b feature/nome-da-feature
-   ```
-
-3. Faça commit das alterações
-    ```
-    git commit -m "Adiciona nova funcionalidade"
-    ```
-
-4. Envie para o repositório remoto
-    ```
-    git push origin feature/nome-da-feature
-    ```
-
-## Colaboração em Tempo Real
-Para desenvolvimento colaborativo:
-
-Use VS Code + Live Share
-
-O integrante do grupo gera o link e compartilha com os demais
-
-Todos podem editar simultaneamente e testar em tempo real
-
 ## Equipe
 
 | Nome | Função | Github
 |----------|------------|------------|
 | Augusto | Front-End | AugustoReich |
-| Lukka | Front-End | ... |
-| Jonathan | Back-End | ... |
+| Lukka | Front-End | LukkaHoffmann |
+| Jonathan | Back-End | JGheno |
 | Camila | Full-Stack | CamilaPeretto |
 
 ## Design
