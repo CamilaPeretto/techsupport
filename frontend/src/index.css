@@ -1,0 +1,182 @@
+/* Importa fontes do Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap');
+
+/* Reset e estilos base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Cores Principais */
+:root {
+  --magenta: #E627F8;
+  --vermelho: #FF0007;
+  --laranja: #FF841B;
+  --preto: #000000;
+  --branco: #FFFFFF;
+
+  /* Cores Secundárias */
+  --cinza-escuro: #212121;
+  --cinza-azulado: #28282E;
+  --azul-acinzentado: #6272A4;
+  --ciano: #00FFFF;
+  --rosa-claro: #FF66CC;
+
+  /* Tipografia */
+  --font-principal: 'Fira Code', monospace;
+  --font-secundaria: 'Inter', sans-serif;
+
+  /* Espaçamento e bordas */
+  --border-radius: 8px;
+  --padding-base: 12px;
+  --margin-base: 16px;
+
+  /* Sombras */
+  --box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+/* Layout principal */
+.dashboard-layout {
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--preto);
+  color: var(--branco);
+}
+
+.dashboard-content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow-y: auto;
+  background-color: var(--preto);
+}
+
+/* Sidebar */
+.sidebar-btn {
+  color: var(--branco);
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.sidebar-btn:hover {
+  background-color: var(--magenta);
+  color: var(--branco);
+}
+
+/* Corpo e tipografia */
+body {
+  font-family: var(--font-secundaria);
+  background: var(--preto);
+  color: var(--branco);
+  min-height: 100vh;
+}
+
+/* Títulos */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-principal);
+}
+
+/* Customização do Bootstrap - Inputs */
+.form-control {
+  background-color: var(--cinza-azulado);
+  border-color: var(--cinza-escuro);
+  color: var(--branco);
+}
+
+.form-control:focus {
+  background-color: var(--cinza-azulado);
+  border-color: var(--magenta);
+  color: var(--branco);
+  box-shadow: 0 0 0 0.2rem rgba(230, 39, 248, 0.25);
+}
+
+.form-control::placeholder {
+  color: var(--azul-acinzentado);
+}
+
+/* Labels */
+.form-label {
+  font-family: var(--font-principal);
+  font-weight: 500;
+  color: var(--branco);
+  margin-bottom: 0.5rem;
+}
+
+/* Botões */
+.btn {
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.btn-link:hover {
+  color: var(--magenta);
+  transform: scale(1.05);
+}
+
+.btn-primary {
+  background-color: var(--magenta);
+  border-color: var(--magenta);
+  font-family: var(--font-principal);
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: #d020e0;
+  border-color: #d020e0;
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(230, 39, 248, 0.6);
+}
+
+.btn-primary:focus {
+  box-shadow: 0 0 0 0.2rem rgba(230, 39, 248, 0.5);
+}
+
+/* Modais */
+.modal-content {
+  background-color: var(--cinza-azulado);
+  border-color: var(--cinza-escuro);
+}
+
+.modal-header {
+  border-bottom-color: var(--cinza-escuro);
+}
+
+.modal-footer {
+  border-top-color: var(--cinza-escuro);
+}
+
+/* Toast */
+.toast {
+  font-family: var(--font-secundaria);
+}
+
+/* Linha divisória */
+.divider-line {
+  border: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--magenta), transparent);
+  margin: 1.5rem 0;
+}
+
+/* Scrollbar customizada (Webkit) */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--cinza-escuro);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--magenta);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #d020e0;
+}
