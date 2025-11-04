@@ -1,7 +1,16 @@
 // Modal exibido quando ocorre erro no login
-import { useState, useEffect } from 'react';
+import { useState, useEffect, FormEvent } from 'react';
 import { Modal, Form, Button } from 'react-bootstrap';
 import { AlertCircle } from 'lucide-react';
+
+interface LoginErrorModalProps {
+  show: boolean;
+  onHide: () => void;
+  errorMessage: string;
+  email: string;
+  password: string;
+  onRetry: (e: FormEvent) => void;
+}
 
 const LoginErrorModal = ({ 
   show, 
@@ -10,7 +19,7 @@ const LoginErrorModal = ({
   email: initialEmail, 
   password: initialPassword, 
   onRetry 
-}) => {
+}: LoginErrorModalProps) => {
   // Estados para armazenar os valores editados
   const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState(initialPassword);
@@ -22,10 +31,10 @@ const LoginErrorModal = ({
   }, [initialEmail, initialPassword]);
 
   // Função que tenta fazer login novamente
-  const handleSubmit = (e) => {
-    e.preventDefault(); // Evita recarregar a página
-    onRetry(e); // Chama a função de retry do componente pai
-    onHide(); // Fecha o modal
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    onRetry(e);
+    onHide();
   };
 
   return (
@@ -99,7 +108,7 @@ const LoginErrorModal = ({
               className="flex-fill fw-bold"
               onClick={onHide}
             >
-              Fechar
+              Cancelar
             </Button>
             <Button 
               type="submit" 
@@ -109,7 +118,7 @@ const LoginErrorModal = ({
                 borderColor: '#E627F8',
               }}
             >
-              Entrar
+              Tentar Novamente
             </Button>
           </div>
         </Form>

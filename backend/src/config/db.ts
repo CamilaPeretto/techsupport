@@ -1,8 +1,9 @@
 // Importa o mongoose, biblioteca para conectar e interagir com o MongoDB
-const mongoose = require("mongoose");
-
+import mongoose from "mongoose";
 // Carrega variáveis de ambiente do arquivo .env
-require("dotenv").config();
+import dotenv from "dotenv";
+
+dotenv.config();
 
 // Define uma configuração do mongoose para evitar warnings de consultas antigas
 mongoose.set("strictQuery", true);
@@ -12,7 +13,7 @@ const dbUser = process.env.DB_USER;
 const dbPassword = process.env.DB_PASS;
 
 // Função assíncrona para conectar ao MongoDB
-async function connectDB() {
+async function connectDB(): Promise<void> {
   try {
     // Faz a conexão com o banco no MongoDB Atlas usando credenciais e URI
     await mongoose.connect(
@@ -28,4 +29,4 @@ async function connectDB() {
 }
 
 // Exporta a função para ser usada em outro arquivo (server.js)
-module.exports = connectDB;
+export default connectDB;

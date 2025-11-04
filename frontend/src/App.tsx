@@ -1,8 +1,7 @@
-import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import DashboardTest from "./pages/DashboardTest";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Login from "./pages/login"
+import Login from "./pages/login/Index";
 
 function App() {
   return (

@@ -1,8 +1,7 @@
 // Importa o app configurado do arquivo app.js
-const app = require("./app");
-
+import app from "./app";
 // Importa a função de conexão com o banco de dados
-const connectDB = require("./config/db");
+import connectDB from "./config/db";
 
 // Define a porta do servidor, vinda do .env ou padrão 5000
 const PORT = process.env.PORT || 5000;

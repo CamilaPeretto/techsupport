@@ -1,8 +1,13 @@
-import React from "react";
+import { ReactNode } from "react";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 
-const DashboardLayout = ({ children, role }) => {
+interface DashboardLayoutProps {
+  children: ReactNode;
+  role: "user" | "tech" | "admin";
+}
+
+const DashboardLayout = ({ children, role }: DashboardLayoutProps) => {
   return (
     <div className="d-flex vh-100 bg-dark">
       {/* Sidebar fixa */}

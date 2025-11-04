@@ -1,10 +1,23 @@
 // Modal para criar uma nova conta
-import { useState } from 'react';
+import { useState, FormEvent } from 'react';
 import { Modal, Form, Button, Toast, ToastContainer } from 'react-bootstrap';
 
-const CreateAccountModal = ({ show, onHide }) => {
+interface CreateAccountModalProps {
+  show: boolean;
+  onHide: () => void;
+}
+
+interface FormData {
+  name: string;
+  username: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
+
+const CreateAccountModal = ({ show, onHide }: CreateAccountModalProps) => {
   // Estado que armazena todos os dados do formulário
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     name: '',
     username: '',
     email: '',
@@ -15,23 +28,23 @@ const CreateAccountModal = ({ show, onHide }) => {
   // Estado para controlar toast
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
-  const [toastVariant, setToastVariant] = useState('success');
+  const [toastVariant, setToastVariant] = useState<'success' | 'danger'>('success');
 
   // Atualiza um campo específico do formulário
-  const handleChange = (field, value) => {
+  const handleChange = (field: keyof FormData, value: string) => {
     setFormData({ ...formData, [field]: value });
   };
 
   // Mostra toast com mensagem
-  const showMessage = (message, variant = 'danger') => {
+  const showMessage = (message: string, variant: 'success' | 'danger' = 'danger') => {
     setToastMessage(message);
     setToastVariant(variant);
     setShowToast(true);
   };
 
   // Função que processa o envio do formulário
-  const handleSubmit = (e) => {
-    e.preventDefault(); // Evita recarregar a página
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
 
     // Validação 1: Verifica se todos os campos estão preenchidos
     if (!formData.name || !formData.username || !formData.email || !formData.password || !formData.confirmPassword) {
@@ -170,7 +183,7 @@ const CreateAccountModal = ({ show, onHide }) => {
             {/* Botão Criar Conta */}
             <Button 
               type="submit" 
-              className="w-100 fw-bold mb-3"
+              className="w-100 fw-bold"
               size="lg"
               style={{
                 backgroundColor: '#E627F8',
@@ -179,18 +192,6 @@ const CreateAccountModal = ({ show, onHide }) => {
             >
               Criar Conta
             </Button>
-
-            {/* Link para voltar ao login */}
-            <div className="text-center">
-              <button
-                type="button"
-                onClick={onHide}
-                className="btn btn-link text-decoration-none"
-                style={{ color: '#6272A4' }}
-              >
-                Já tem uma conta?
-              </button>
-            </div>
           </Form>
         </Modal.Body>
       </Modal>
@@ -205,9 +206,7 @@ const CreateAccountModal = ({ show, onHide }) => {
           bg={toastVariant}
         >
           <Toast.Header>
-            <strong className="me-auto">
-              {toastVariant === 'success' ? 'Sucesso!' : 'Erro'}
-            </strong>
+            <strong className="me-auto">{toastVariant === 'success' ? 'Sucesso!' : 'Erro'}</strong>
           </Toast.Header>
           <Toast.Body className="text-white">{toastMessage}</Toast.Body>
         </Toast>

@@ -1,12 +1,12 @@
 // Componente do formulário de login principal
-import { useState } from 'react';
+import { useState, FormEvent } from 'react';
 import { Container, Form, Button, Toast, ToastContainer } from 'react-bootstrap';
-import { useDispatch, useSelector } from 'react-redux';
 import { loginStart, loginSuccess, loginFailure, clearError } from '../../store/authSlice';
 import logo from '../../assets/logo.png';
 import CreateAccountModal from './CreateAccountModal';
 import ForgotPasswordModal from './ForgotPasswordModal';
 import LoginErrorModal from './LoginErrorModal';
+import { useAppDispatch, useAppSelector } from '../../hooks/useRedux';
 
 const LoginForm = () => {
   // Estados locais para controlar os campos do formulário
@@ -23,14 +23,14 @@ const LoginForm = () => {
   const [showToast, setShowToast] = useState(false);
 
   // Redux hooks
-  const dispatch = useDispatch();
-  const { loading } = useSelector((state) => state.auth);
+  const dispatch = useAppDispatch();
+  const { loading } = useAppSelector((state) => state.auth);
 
   // Função que valida e processa o login
-  const handleLogin = (e) => {
-    e.preventDefault(); // Evita recarregar a página
+  const handleLogin = (e: FormEvent) => {
+    e.preventDefault();
 
-    dispatch(loginStart()); // Inicia o loading
+    dispatch(loginStart());
 
     // Validação 1: Verifica se os campos estão preenchidos
     if (!email || !password) {
@@ -87,10 +87,10 @@ const LoginForm = () => {
                 transition: 'all 0.3s ease',
               }}
               onMouseEnter={(e) => {
-                e.target.style.filter = 'drop-shadow(0 0 30px rgba(230, 39, 248, 0.7))';
+                e.currentTarget.style.filter = 'drop-shadow(0 0 30px rgba(230, 39, 248, 0.7))';
               }}
               onMouseLeave={(e) => {
-                e.target.style.filter = 'drop-shadow(0 0 20px rgba(230, 39, 248, 0.5))';
+                e.currentTarget.style.filter = 'drop-shadow(0 0 20px rgba(230, 39, 248, 0.5))';
               }}
             />
           </div>
@@ -219,4 +219,4 @@ const LoginForm = () => {
   );
 };
 
-export default LoginForm;                                                                                                                                   
+export default LoginForm;

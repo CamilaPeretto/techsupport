@@ -1,14 +1,14 @@
-import React from "react";
 import { Plus } from "lucide-react";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-// Componente funcional Header que recebe props: role, currentPage e userName
-// Valores padrão: role = "user", currentPage = "Dashboard", userName = "Técnico"
-const Header = ({ role = "user", currentPage = "Dashboard", userName = "Técnico" }) => {
-  
-  // Define a cor de fundo do header dependendo do tipo de usuário (tech ou user)
-  const headerBg =
-    role === "tech" ? "var(--preto)" : "var(--cinza-azulado)";
+interface HeaderProps {
+  role?: "user" | "tech" | "admin";
+  currentPage?: string;
+  userName?: string;
+}
+
+const Header = ({ role = "user", currentPage = "Dashboard", userName = "Técnico" }: HeaderProps) => {
+  const headerBg = role === "tech" ? "var(--preto)" : "var(--cinza-azulado)";
 
   return (
     <header
@@ -28,13 +28,11 @@ const Header = ({ role = "user", currentPage = "Dashboard", userName = "Técnico
           fontWeight: "bold",
         }}
       >
-        {/* Mostra o nome da página atual */}
         {currentPage}
       </h4>
 
       {/* Conteúdo da direita do header */}
       <div className="d-flex align-items-center">
-        {/* Se for usuário comum, mostra botão "Novo Chamado" */}
         {role === "user" ? (
           <button
             className="d-flex align-items-center justify-content-center"
@@ -62,8 +60,6 @@ const Header = ({ role = "user", currentPage = "Dashboard", userName = "Técnico
             Novo Chamado
           </button>
         ) : (
-          
-          // Se for técnico, mostra uma saudação com o nome do usuário
           <span
             style={{
               color: "var(--branco)",

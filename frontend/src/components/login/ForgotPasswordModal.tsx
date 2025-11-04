@@ -1,25 +1,30 @@
 // Modal para recuperação de senha
-import { useState } from 'react';
+import { useState, FormEvent } from 'react';
 import { Modal, Form, Button, Toast, ToastContainer } from 'react-bootstrap';
 
-const ForgotPasswordModal = ({ show, onHide }) => {
-  const [email, setEmail] = useState(''); // Estado para armazenar o email
+interface ForgotPasswordModalProps {
+  show: boolean;
+  onHide: () => void;
+}
+
+const ForgotPasswordModal = ({ show, onHide }: ForgotPasswordModalProps) => {
+  const [email, setEmail] = useState('');
   
   // Estado para controlar toast
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
-  const [toastVariant, setToastVariant] = useState('success');
+  const [toastVariant, setToastVariant] = useState<'success' | 'danger'>('success');
 
   // Mostra toast com mensagem
-  const showMessage = (message, variant = 'danger') => {
+  const showMessage = (message: string, variant: 'success' | 'danger' = 'danger') => {
     setToastMessage(message);
     setToastVariant(variant);
     setShowToast(true);
   };
 
   // Função que processa o envio do formulário
-  const handleSubmit = (e) => {
-    e.preventDefault(); // Evita recarregar a página
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
 
     // Validação 1: Verifica se o email foi preenchido
     if (!email) {
@@ -103,9 +108,7 @@ const ForgotPasswordModal = ({ show, onHide }) => {
           bg={toastVariant}
         >
           <Toast.Header>
-            <strong className="me-auto">
-              {toastVariant === 'success' ? 'Sucesso!' : 'Erro'}
-            </strong>
+            <strong className="me-auto">{toastVariant === 'success' ? 'Sucesso!' : 'Erro'}</strong>
           </Toast.Header>
           <Toast.Body className="text-white">{toastMessage}</Toast.Body>
         </Toast>

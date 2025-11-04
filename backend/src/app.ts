@@ -1,26 +1,24 @@
 // Importa o Express, framework para criar o servidor e gerenciar rotas
-const express = require("express");
-
+import express, { Express, Request, Response } from "express";
 // Importa o CORS para permitir que o frontend acesse a API
-const cors = require("cors");
-
+import cors from "cors";
 // Importa o Helmet para adicionar cabeçalhos de segurança HTTP
-const helmet = require("helmet");
-
+import helmet from "helmet";
 // Importa o express-rate-limit, que limita o número de requisições (protege contra ataques DoS)
-const rateLimit = require("express-rate-limit");
-
+import rateLimit from "express-rate-limit";
 // Importa o cookie-parser para ler cookies enviados pelo cliente
-const cookieParser = require("cookie-parser");
-
+import cookieParser from "cookie-parser";
 // Importa o morgan, middleware para logar requisições no terminal
-const morgan = require("morgan");
-
+import morgan from "morgan";
 // Carrega variáveis de ambiente
-require("dotenv").config();
+import dotenv from "dotenv";
+// Importa as rotas
+import userRoutes from "./routes/userRoutes";
+
+dotenv.config();
 
 // Cria a instância principal do app Express
-const app = express();
+const app: Express = express();
 
 // ---------- MIDDLEWARES DE SEGURANÇA E CONFIGURAÇÃO ----------
 
@@ -50,11 +48,14 @@ const limiter = rateLimit({
 // Aplica o limitador a todas as rotas da API
 app.use(limiter);
 
+// ---------- ROTAS ----------
+app.use("/api", userRoutes);
+
 // ---------- ROTAS BÁSICAS ----------
 // Rota inicial apenas para teste, retorna mensagem de status
-app.get("/", (req, res) => {
+app.get("/", (_req: Request, res: Response) => {
   res.status(200).json({ message: "API TechSupport online!" });
 });
 
 // Exporta o app para ser usado em server.js
-module.exports = app;
+export default app;
