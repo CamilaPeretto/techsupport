@@ -144,7 +144,7 @@ export const assignTicket = async (req: Request, res: Response): Promise<void> =
 
     // Autorização simples: apenas técnicos podem atribuir
     const currentUser = (req as any).user as { id: string; role?: string } | undefined;
-    if (currentUser && currentUser.role && currentUser.role !== 'tech' && currentUser.role !== 'admin') {
+    if (currentUser && currentUser.role && currentUser.role !== 'tech') {
       res.status(403).json({ message: "Apenas técnicos podem atribuir tickets" });
       return;
     }
