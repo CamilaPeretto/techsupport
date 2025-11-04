@@ -7,25 +7,26 @@ import {
   assignTicket,
   deleteTicket,
 } from "../controllers/ticketController";
+import { requireTech } from "../middleware/requireTech";
 
 const router = Router();
 
-// Criar novo ticket
+// Criar novo ticket (usuários e técnicos)
 router.post("/", createTicket);
 
 // Listar todos os tickets (para técnicos)
 router.get("/", getAllTickets);
 
-// Obter ticket específico por ID
+// Obter ticket específico por ID (usuários e técnicos)
 router.get("/:id", getTicketById);
 
-// Atualizar status do ticket
-router.put("/:id/status", updateTicketStatus);
+// Atualizar status do ticket (APENAS técnicos)
+router.put("/:id/status", requireTech, updateTicketStatus);
 
-// Atribuir ticket a um técnico
-router.put("/:id/assign", assignTicket);
+// Atribuir ticket a um técnico (APENAS técnicos)
+router.put("/:id/assign", requireTech, assignTicket);
 
-// Deletar ticket
-router.delete("/:id", deleteTicket);
+// Deletar ticket (APENAS técnicos)
+router.delete("/:id", requireTech, deleteTicket);
 
 export default router;

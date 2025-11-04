@@ -5,18 +5,24 @@ import mongoose from "mongoose";
 // Controlador para criar um novo ticket
 export const createTicket = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { title, description, userId, priority, type } = req.body;
+    const { title, description, priority, type } = req.body;
 
     // Validação
-    if (!title || !userId) {
-      res.status(400).json({ message: "Título e userId são obrigatórios" });
+    if (!title) {
+      res.status(400).json({ message: "Título é obrigatório" });
+      return;
+    }
+
+    // Usa o ID do usuário autenticado
+    if (!req.user || !req.user.id) {
+      res.status(401).json({ message: "Usuário não autenticado" });
       return;
     }
 
     const newTicket = await Ticket.create({
       title,
       description,
-      userId,
+      userId: req.user.id,
       priority: priority || "média",
       type: type || "outros",
     });
@@ -44,8 +50,16 @@ export const getAllTickets = async (req: Request, res: Response): Promise<void> 
     };
 
     const filter: Record<string, unknown> = {};
-    if (assignedTo) filter.assignedTo = assignedTo;
-    if (userId) filter.userId = userId;
+    
+    // Se o usuário não é técnico, só pode ver seus próprios tickets
+    if (req.user && req.user.role !== "tech") {
+      filter.userId = req.user.id;
+    } else {
+      // Técnicos podem filtrar por qualquer userId ou assignedTo
+      if (assignedTo) filter.assignedTo = assignedTo;
+      if (userId) filter.userId = userId;
+    }
+    
     if (status) filter.status = status;
     if (priority) filter.priority = priority;
     if (type) filter.type = type;
@@ -83,6 +97,15 @@ export const getTicketById = async (req: Request, res: Response): Promise<void> 
     if (!ticket) {
       res.status(404).json({ message: "Ticket não encontrado" });
       return;
+    }
+
+    // Verifica se o usuário tem permissão para ver este ticket
+    // Técnicos podem ver todos, usuários só podem ver seus próprios
+    if (req.user && req.user.role !== "tech") {
+      if (ticket.userId._id.toString() !== req.user.id) {
+        res.status(403).json({ message: "Você não tem permissão para ver este ticket" });
+        return;
+      }
     }
 
     res.status(200).json(ticket);
@@ -142,9 +165,8 @@ export const assignTicket = async (req: Request, res: Response): Promise<void> =
       return;
     }
 
-    // Autorização simples: apenas técnicos podem atribuir
-    const currentUser = (req as any).user as { id: string; role?: string } | undefined;
-    if (currentUser && currentUser.role && currentUser.role !== 'tech') {
+    // Já verificado pelo middleware requireTech, mas mantém verificação defensiva
+    if (!req.user || req.user.role !== 'tech') {
       res.status(403).json({ message: "Apenas técnicos podem atribuir tickets" });
       return;
     }
