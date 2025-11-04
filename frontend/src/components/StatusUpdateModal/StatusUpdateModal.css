@@ -1,0 +1,21 @@
+/* Copiado do colaborador1: estilos do modal de status */
+.status-modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background-color:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:1000;animation:fadeIn .2s ease-out}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.status-modal-container{background-color:#3a3f47;border-radius:12px;padding:24px;width:90%;max-width:420px;box-shadow:0 10px 40px rgba(0,0,0,.4);animation:slideUp .3s ease-out}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.status-modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+.status-modal-title{font-size:20px;font-weight:500;color:#fff;margin:0;font-family:'Segoe UI',system-ui,sans-serif}
+.status-modal-close{background:none;border:none;color:#a0a4ab;cursor:pointer;padding:4px;display:flex;align-items:center;justify-content:center;border-radius:4px;transition:all .2s ease}
+.status-modal-close:hover{background-color:rgba(255,255,255,.1);color:#fff}
+.status-options-container{display:flex;flex-direction:column;gap:12px;margin-bottom:24px}
+.status-option{background-color:#2f3439;border:2px solid #4a4f57;border-radius:8px;padding:16px;color:#e0e0e0;font-size:15px;font-weight:400;text-align:left;cursor:pointer;transition:all .2s ease;font-family:'Segoe UI',system-ui,sans-serif}
+.status-option:hover{background-color:#353a41;border-color:#5a5f67}
+.status-option-selected{background-color:#2a2e34;border-color:#fff;color:#fff}
+.status-option-selected:hover{background-color:#2a2e34;border-color:#fff}
+.status-modal-actions{display:flex;justify-content:flex-end;gap:12px;margin-top:24px}
+.status-btn-cancel{background:none;border:none;color:#e0e0e0;font-size:15px;font-weight:500;padding:10px 20px;border-radius:6px;cursor:pointer;transition:all .2s ease;font-family:'Segoe UI',system-ui,sans-serif}
+.status-btn-cancel:hover{background-color:rgba(255,255,255,.08)}
+.status-btn-update{background:linear-gradient(135deg,#d946ef 0%,#c026d3 100%);border:none;color:#fff;font-size:15px;font-weight:600;padding:10px 24px;border-radius:6px;cursor:pointer;transition:all .2s ease;box-shadow:0 4px 12px rgba(217,70,239,.3);font-family:'Segoe UI',system-ui,sans-serif}
+.status-btn-update:hover{background:linear-gradient(135deg,#e879f9 0%,#d946ef 100%);box-shadow:0 6px 16px rgba(217,70,239,.4);transform:translateY(-1px)}
+.status-btn-update:active{transform:translateY(0)}
+@media (max-width:480px){.status-modal-container{padding:20px;max-width:95%}.status-modal-title{font-size:18px}.status-option{padding:14px;font-size:14px}.status-modal-actions{flex-direction:column;gap:8px}.status-btn-cancel,.status-btn-update{width:100%}}
