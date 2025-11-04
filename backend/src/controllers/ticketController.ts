@@ -1,3 +1,4 @@
+/// <reference path="../types/express.d.ts" />
 import { Request, Response } from "express";
 import Ticket from "../models/Ticket";
 import mongoose from "mongoose";
