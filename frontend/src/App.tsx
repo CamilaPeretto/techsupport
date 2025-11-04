@@ -8,7 +8,10 @@ import StatusUpdateModal from "./components/StatusUpdateModal";
 import Profile from "./pages/Profile";
 import Schedule from "./pages/Schedule";
 import ProtectedRoute from "./routes/ProtectedRoute";
-import TicketDetail from "./pages/TicketDetail";
+// Inline placeholder for TicketDetail component (replace with the real ./pages/TicketDetail later)
+const TicketDetail = () => {
+  return <div>Ticket detail page (placeholder)</div>;
+};
 
 function App() {
   return (
