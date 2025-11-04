@@ -1,25 +1,26 @@
 // Importa o Express, framework para criar o servidor e gerenciar rotas
-import express, { Express, Request, Response } from "express";
-// Importa o CORS para permitir que o frontend acesse a API
-import cors from "cors";
-// Importa o Helmet para adicionar cabeçalhos de segurança HTTP
-import helmet from "helmet";
-// Importa o express-rate-limit, que limita o número de requisições (protege contra ataques DoS)
-import rateLimit from "express-rate-limit";
-// Importa o cookie-parser para ler cookies enviados pelo cliente
-import cookieParser from "cookie-parser";
-// Importa o morgan, middleware para logar requisições no terminal
-import morgan from "morgan";
-// Carrega variáveis de ambiente
-import dotenv from "dotenv";
-// Importa as rotas
-import userRoutes from "./routes/userRoutes";
-import ticketRoutes from "./routes/ticketRoutes";
+const express = require("express");
 
-dotenv.config();
+// Importa o CORS para permitir que o frontend acesse a API
+const cors = require("cors");
+
+// Importa o Helmet para adicionar cabeçalhos de segurança HTTP
+const helmet = require("helmet");
+
+// Importa o express-rate-limit, que limita o número de requisições (protege contra ataques DoS)
+const rateLimit = require("express-rate-limit");
+
+// Importa o cookie-parser para ler cookies enviados pelo cliente
+const cookieParser = require("cookie-parser");
+
+// Importa o morgan, middleware para logar requisições no terminal
+const morgan = require("morgan");
+
+// Carrega variáveis de ambiente
+require("dotenv").config();
 
 // Cria a instância principal do app Express
-const app: Express = express();
+const app = express();
 
 // ---------- MIDDLEWARES DE SEGURANÇA E CONFIGURAÇÃO ----------
 
@@ -49,17 +50,11 @@ const limiter = rateLimit({
 // Aplica o limitador a todas as rotas da API
 app.use(limiter);
 
-// ---------- ROTAS ----------
-app.use("/api", userRoutes);
-app.use("/api/tickets", ticketRoutes);
-app.use("/api/ticket", ticketRoutes); // Alias para compatibilidade
-app.use("/api/tecnico/tickets", ticketRoutes); // Rota para técnicos
-
 // ---------- ROTAS BÁSICAS ----------
 // Rota inicial apenas para teste, retorna mensagem de status
-app.get("/", (_req: Request, res: Response) => {
-  res.status(200).json({ message: "API TechSupport online! 🚀" });
+app.get("/", (req, res) => {
+  res.status(200).json({ message: "API TechSupport online!" });
 });
 
 // Exporta o app para ser usado em server.js
-export default app;
+module.exports = app;
