@@ -34,6 +34,20 @@
 
   /* Sombras */
   --box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.4);
+
+  /* Aliases para componentes do colaborador */
+  --color-primary-magenta: var(--magenta);
+  --color-primary-white: var(--branco);
+  --color-primary-black: var(--preto);
+  --color-secondary-dark-gray: var(--cinza-escuro);
+  --color-secondary-bluish-gray: var(--cinza-azulado);
+  --color-secondary-grayish-blue: var(--azul-acinzentado);
+  --gradient-primary: linear-gradient(90deg, var(--magenta), var(--laranja));
+  --font-family-primary: var(--font-principal);
+  --font-family-secondary: var(--font-secundaria);
+  --border-radius-base: var(--border-radius);
+  --font-weight-medium: 500;
+  --shadow-base: var(--box-shadow);
 }
 
 /* Layout principal */
