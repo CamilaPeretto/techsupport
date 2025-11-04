@@ -81,3 +81,40 @@ export const getAllUsers = async (_req: Request, res: Response): Promise<void> =
     res.status(500).json({ message: "Erro ao buscar usuários", error });
   }
 };
+
+// Obter um usuário por ID
+export const getUserById = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const user = await User.findById(id).select("-password");
+    if (!user) {
+      res.status(404).json({ message: "Usuário não encontrado" });
+      return;
+    }
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({ message: "Erro ao buscar usuário", error });
+  }
+};
+
+// Atualizar perfil do usuário
+export const updateUser = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const { name, email, password } = req.body as { name?: string; email?: string; password?: string };
+
+    const update: Record<string, unknown> = {};
+    if (name) update.name = name;
+    if (email) update.email = email;
+    if (password) update.password = await bcrypt.hash(password, 10);
+
+    const updated = await User.findByIdAndUpdate(id, update, { new: true }).select("-password");
+    if (!updated) {
+      res.status(404).json({ message: "Usuário não encontrado" });
+      return;
+    }
+    res.status(200).json({ message: "Perfil atualizado com sucesso", user: updated });
+  } catch (error) {
+    res.status(500).json({ message: "Erro ao atualizar perfil", error });
+  }
+};

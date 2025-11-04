@@ -30,9 +30,22 @@ export const createTicket = async (req: Request, res: Response): Promise<void> =
 };
 
 // Controlador para listar todos os tickets
-export const getAllTickets = async (_req: Request, res: Response): Promise<void> => {
+export const getAllTickets = async (req: Request, res: Response): Promise<void> => {
   try {
-    const tickets = await Ticket.find()
+    const { assignedTo, userId, status, priority } = req.query as {
+      assignedTo?: string;
+      userId?: string;
+      status?: string;
+      priority?: string;
+    };
+
+    const filter: Record<string, unknown> = {};
+    if (assignedTo) filter.assignedTo = assignedTo;
+    if (userId) filter.userId = userId;
+    if (status) filter.status = status;
+    if (priority) filter.priority = priority;
+
+    const tickets = await Ticket.find(filter)
       .populate("userId", "name email role")
       .populate("assignedTo", "name email")
       .sort({ createdAt: -1 });

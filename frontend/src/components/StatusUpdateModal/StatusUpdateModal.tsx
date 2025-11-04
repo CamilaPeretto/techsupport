@@ -18,9 +18,15 @@ const StatusUpdateModal = () => {
   };
 
   const handleUpdate = async () => {
-    // Aqui poderia chamar API com axios para persistir
-    dispatch(setStatus(selectedStatus));
-    dispatch(closeModal());
+    // Integração: quando houver um ticket selecionado globalmente, poderíamos enviar a atualização.
+    // MVP: apenas fecha e atualiza o estado local do modal.
+    try {
+      // Exemplo comentado de como seria a chamada:
+      // await axios.put(`/api/tickets/${selectedTicketId}/status`, { status: 'em andamento' | 'concluído' | 'aberto' });
+      dispatch(setStatus(selectedStatus));
+    } finally {
+      dispatch(closeModal());
+    }
   };
 
   if (!isModalOpen) return null;
