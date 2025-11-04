@@ -1,13 +1,15 @@
 import { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { X } from 'lucide-react';
 import type { RootState } from '../../store/store';
 import { setStatus, closeModal, type StatusType } from '../../store/statusSlice';
+import { useAppDispatch, useAppSelector } from '../../hooks/useRedux';
+import { updateTicketStatus, type TicketStatus } from '../../store/ticketsSlice';
 import './StatusUpdateModal.css';
 
 const StatusUpdateModal = () => {
-  const dispatch = useDispatch();
-  const { currentStatus, isModalOpen } = useSelector((state: RootState) => state.status);
+  const dispatch = useAppDispatch();
+  const { currentStatus, isModalOpen } = useAppSelector((state: RootState) => state.status);
+  const selectedTicketId = useAppSelector((state: RootState) => state.tickets.selectedTicketId);
   const [selectedStatus, setSelectedStatus] = useState<StatusType>(currentStatus);
 
   const statusOptions: StatusType[] = ['Pendente', 'Em andamento', 'Concluído'];
@@ -18,11 +20,21 @@ const StatusUpdateModal = () => {
   };
 
   const handleUpdate = async () => {
-    // Integração: quando houver um ticket selecionado globalmente, poderíamos enviar a atualização.
-    // MVP: apenas fecha e atualiza o estado local do modal.
     try {
-      // Exemplo comentado de como seria a chamada:
-      // await axios.put(`/api/tickets/${selectedTicketId}/status`, { status: 'em andamento' | 'concluído' | 'aberto' });
+      const mapToDomain = (s: StatusType): TicketStatus => {
+        switch (s) {
+          case 'Pendente':
+            return 'aberto';
+          case 'Em andamento':
+            return 'em andamento';
+          case 'Concluído':
+          default:
+            return 'concluído';
+        }
+      };
+      if (selectedTicketId) {
+        await dispatch(updateTicketStatus({ id: selectedTicketId, status: mapToDomain(selectedStatus) }));
+      }
       dispatch(setStatus(selectedStatus));
     } finally {
       dispatch(closeModal());

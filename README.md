@@ -1,161 +1,165 @@
-# Tech Support
+# TechSupport
 
-Plataforma web para abertura e gerenciamento de **chamados técnicos**, permitindo que usuários registrem problemas e técnicos acompanhem, filtrem e atualizem o status das solicitações.
-
----
-
-##  Tecnologias Utilizadas
-
-###  Front-end
-- **React (Vite)**
-- **React Router DOM**
-- **Redux**
-- **Axios**
-- **Bootstrap**
-- **Lucide React** (ícones)
-- **ESLint + Prettier** (padrões de código)
-
-###  Back-end
-- **Node.js**
-- **Express**
-- **Mongoose**
-- **MongoDB**
-- **CORS**
-- **JWT (jsonwebtoken)**
-- **bcrypt** (hash de senhas)
-- **dotenv**
-- **helmet** (segurança HTTP)
-- **express-rate-limit**
-- **cookie-parser**
-- **morgan** (logs)
-- **validator**
+Plataforma web para abertura e gerenciamento de chamados técnicos, agora inteiramente em TypeScript (frontend e backend).
 
 ---
 
-##  Estrutura de Pastas
-```
-techsupport/
-│    ├── backend/
-│    │   ├── src/
-│    │   │   ├── config/
-│    │   │   ├── db.js                      
-│    │   │   └── rateLimit.js               
-│    │   │
-│    │   ├── middleware/
-│    │   │   ├── authMiddleware.js          
-│    │   │   ├── errorHandler.js           
-│    │   │   └── validateRequest.js         
-│    │   │
-│    │   ├── models/
-│    │   │   ├── User.js
-│    │   │   ├── Ticket.js
-│    │   │   └── Log.js
-│    │   │
-│    │   ├── controllers/
-│    │   │   ├── authController.js
-│    │   │   ├── ticketController.js
-│    │   │   └── userController.js
-│    │   │
-│    │   ├── routes/
-│    │   │   ├── authRoutes.js
-│    │   │   ├── ticketRoutes.js
-│    │   │   └── userRoutes.js
-│    │   │
-│    │   ├── utils/
-│    │   │   ├── generateToken.js
-│    │   │   ├── logger.js
-│    │   │   └── validators.js
-│    │   │
-│    │   ├── app.js                         
-│    │   └── server.js                     
-│    │   │
-│    │   └── package.json
-│    │
-│    │
-│    ├──frontend/
-│    │
-│    ├── src/
-│    │   ├── components/
-│    │   │   └── layout/
-│    │   │       ├── Header.jsx
-│    │   │       ├── Sidebar.jsx
-│    │   │       └── DashboardLayout.jsx
-│    │   │
-│    │   ├── pages/
-│    │   │   └── DashboardTest.jsx
-│    │   │
-│    │   ├── App.css
-│    │   ├── App.jsx
-│    │   ├── main.jsx
-│    │   └── index.css
-│    │
-│    ├── index.html                              
-│    ├── package.json
-│    └── vite.config.js
-│
-├── .eslintrc.json
-├── .prettierrc
-├── package.json
-└── README.md
-```
----
+## Tecnologias
 
-##  Scripts Principais
-
-### Raiz
-| Comando | Descrição |
-|----------|------------|
-| `npm run dev` | Inicia **backend** e **frontend** simultaneamente |
-| `npm run lint` | Verifica erros de padrão de código (ESLint) |
-| `npm run format` | Formata automaticamente o código (Prettier) |
+### Frontend
+- React 19 + Vite 7
+- React Router 7
+- Redux Toolkit 2 + React-Redux 9
+- Axios
+- Bootstrap 5 + React-Bootstrap
+- ESLint (flat config) + TypeScript
 
 ### Backend
-| Comando | Descrição |
-|----------|------------|
-| `npm run dev` | Executa o servidor com nodemon |
-| `npm start` | Executa o servidor normalmente |
+- Node.js + Express 5
+- TypeScript 5 + ts-node/nodemon
+- MongoDB + Mongoose 8
+- JWT (jsonwebtoken), bcrypt
+- CORS, helmet, express-rate-limit, cookie-parser, morgan
+- dotenv
 
 ---
 
-##  Variáveis de Ambiente (Backend)
+## Estrutura (simplificada)
 
-Crie um arquivo `.env` na pasta `backend/` baseado no exemplo:
 ```
-PORT=5000
-MONGO_URI=sua_string_de_conexao
-JWT_SECRET=um_token_secreto_seguro
+techsupport/
+├─ backend/
+│  ├─ src/
+│  │  ├─ app.ts
+│  │  ├─ server.ts
+│  │  ├─ config/
+│  │  │  └─ db.ts
+│  │  ├─ models/
+│  │  │  ├─ User.ts
+│  │  │  └─ Ticket.ts
+│  │  ├─ controllers/
+│  │  │  ├─ userController.ts
+│  │  │  └─ ticketController.ts
+│  │  └─ routes/
+│  │     ├─ userRoutes.ts
+│  │     └─ ticketRoutes.ts
+│  ├─ .env.example
+│  ├─ package.json
+│  └─ tsconfig.json
+│
+└─ frontend/
+	 ├─ src/
+	 │  ├─ main.tsx
+	 │  ├─ App.tsx
+	 │  ├─ store/
+	 │  │  └─ authSlice.ts
+	 │  ├─ hooks/
+	 │  │  └─ useRedux.ts
+	 │  └─ components/
+	 ├─ index.html
+	 ├─ package.json
+	 └─ vite.config.js
 ```
----
-
-##  Funcionalidades Planejadas
-
-###  Usuário
-- Login e registro com autenticação JWT  
-- Abertura de chamados técnicos  
-- Classificação por tipo e urgência  
-- Acompanhamento do status dos chamados  
-
-###  Técnico
-- Login e registro de novos técnicos  
-- Atribuição de chamados a técnicos  
-- Atualização de status (“Aberto”, “Em andamento”, “Finalizado”)  
-- Registro da resolução e observações  
-- Filtros por data, usuário, tipo e status  
 
 ---
 
-## Equipe
+## Scripts principais
 
-| Nome | Função | Github
-|----------|------------|------------|
-| Augusto | Front-End | AugustoReich |
-| Lukka | Front-End | LukkaHoffmann |
-| Jonathan | Back-End | JGheno |
-| Camila | Full-Stack | CamilaPeretto |
+### Raiz
+- `npm run dev` – inicia backend e frontend em paralelo (via concurrently)
+- `npm run lint` – lint na raiz (projeto possui ESLint configurado no frontend)
+- `npm run format` – formata com Prettier
 
-## Design
-Baseado no estilo visual do JetBrains
+### Backend (`backend/`)
+- `npm run dev` – desenvolvimento com nodemon + ts-node
+- `npm run build` – compila TypeScript para `dist/`
+- `npm start` – executa `node dist/server.js`
 
-Paleta: Magenta #E627F8, Vermelho #FF0007, Laranja #FF841B, Preto #000, Branco #FFF
+### Frontend (`frontend/`)
+- `npm run dev` – Vite em modo dev
+- `npm run build` – `tsc -b` + build do Vite
+- `npm run preview` – preview do build
 
-Tipografia: Fira Code (títulos) + Inter (texto)
+---
+
+## Variáveis de ambiente (backend)
+
+Crie o arquivo `backend/.env` a partir de `backend/.env.example`.
+
+Opção A: usuário e senha do cluster (Atlas)
+```
+DB_USER=seu_usuario
+DB_PASS=sua_senha
+PORT=3000
+NODE_ENV=development
+JWT_SECRET=sua_chave_secreta_aqui
+```
+
+Opção B: URI completa
+```
+MONGODB_URI=sua_uri_completa_do_mongo
+PORT=3000
+NODE_ENV=development
+JWT_SECRET=sua_chave_secreta_aqui
+```
+
+Observação: por padrão, `src/config/db.ts` usa `DB_USER`/`DB_PASS`. Se preferir `MONGODB_URI`, ajuste o arquivo para ler a variável e priorizá-la.
+
+---
+
+## Como rodar
+
+1) Instalar dependências nas três pastas (raiz, backend, frontend) uma vez:
+
+```bash
+npm install
+npm --prefix backend install
+npm --prefix frontend install
+```
+
+2) Criar e preencher o `backend/.env` conforme acima.
+
+3) Ambiente de desenvolvimento (do repositório raiz):
+
+```bash
+npm run dev
+```
+
+Backend: http://localhost:3000  |  Frontend: http://localhost:5173
+
+4) Build de produção:
+
+```bash
+npm --prefix backend run build
+npm --prefix frontend run build
+```
+
+---
+
+## API (resumo)
+
+- `GET /` – healthcheck
+- `POST /api/register` – cria usuário
+- `POST /api/login` – autentica
+- `GET /api/users` – lista usuários
+
+Tickets
+- `POST /api/tickets` – cria ticket
+- `GET /api/tickets` – lista tickets
+- `GET /api/tickets/:id` – busca por id
+- `PATCH /api/tickets/:id/status` – atualiza status
+- `PATCH /api/tickets/:id/assign` – atribui técnico
+- `DELETE /api/tickets/:id` – remove
+
+Obs.: Algumas rotas podem requerer JWT via header `Authorization: Bearer <token>`.
+
+---
+
+## Notas e próximos passos
+
+- Branches `main` e `develop` estão sincronizadas (Tickets + TypeScript).
+- Removidos arquivos legados `.js`/`.html` após migração.
+- Próximos passos sugeridos:
+	- Adicionar testes (unitários/integrados) no backend.
+	- Configurar ESLint/TS no backend para manter padrões consistentes.
+	- Implementar proteção JWT nas rotas de tickets, se aplicável.
