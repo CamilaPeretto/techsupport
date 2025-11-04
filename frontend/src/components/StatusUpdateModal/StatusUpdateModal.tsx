@@ -4,6 +4,7 @@ import type { RootState } from '../../store/store';
 import { setStatus, closeModal, type StatusType } from '../../store/statusSlice';
 import { useAppDispatch, useAppSelector } from '../../hooks/useRedux';
 import { updateTicketStatus, type TicketStatus } from '../../store/ticketsSlice';
+import { Form } from 'react-bootstrap';
 import './StatusUpdateModal.css';
 
 const StatusUpdateModal = () => {
@@ -11,11 +12,13 @@ const StatusUpdateModal = () => {
   const { currentStatus, isModalOpen } = useAppSelector((state: RootState) => state.status);
   const selectedTicketId = useAppSelector((state: RootState) => state.tickets.selectedTicketId);
   const [selectedStatus, setSelectedStatus] = useState<StatusType>(currentStatus);
+  const [resolution, setResolution] = useState<string>('');
 
   const statusOptions: StatusType[] = ['Pendente', 'Em andamento', 'Concluído'];
 
   const handleCancel = () => {
     setSelectedStatus(currentStatus);
+    setResolution('');
     dispatch(closeModal());
   };
 
@@ -33,7 +36,14 @@ const StatusUpdateModal = () => {
         }
       };
       if (selectedTicketId) {
-        await dispatch(updateTicketStatus({ id: selectedTicketId, status: mapToDomain(selectedStatus) }));
+        const payload: { id: string; status: TicketStatus; resolution?: string } = {
+          id: selectedTicketId,
+          status: mapToDomain(selectedStatus),
+        };
+        if (payload.status === 'concluído' && resolution.trim()) {
+          payload.resolution = resolution.trim();
+        }
+        await dispatch(updateTicketStatus(payload));
       }
       dispatch(setStatus(selectedStatus));
     } finally {
@@ -64,6 +74,13 @@ const StatusUpdateModal = () => {
             </button>
           ))}
         </div>
+
+        {selectedStatus === 'Concluído' && (
+          <div className="mt-3" aria-label="Campo de resolução">
+            <Form.Label className="text-white">Resolução</Form.Label>
+            <Form.Control as="textarea" rows={3} value={resolution} onChange={(e) => setResolution(e.target.value)} placeholder="Descreva a resolução do chamado" />
+          </div>
+        )}
 
         <div className="status-modal-actions">
           <button className="status-btn-cancel" onClick={handleCancel}>

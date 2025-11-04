@@ -15,9 +15,10 @@ interface Ticket {
 interface TicketRowProps {
   ticket: Ticket;
   onClick?: (ticket: Ticket) => void;
+  actions?: React.ReactNode;
 }
 
-const TicketRow: React.FC<TicketRowProps> = ({ ticket, onClick }) => {
+const TicketRow: React.FC<TicketRowProps> = ({ ticket, onClick, actions }) => {
   const getStatusText = (status: string) => {
     switch (status) {
       case 'open':
@@ -97,6 +98,11 @@ const TicketRow: React.FC<TicketRowProps> = ({ ticket, onClick }) => {
           {ticket.requestingEmployee || ticket.assignedTechnician}
         </span>
       </TableCell>
+      {actions && (
+        <TableCell>
+          {actions}
+        </TableCell>
+      )}
     </TableRow>
   );
 };

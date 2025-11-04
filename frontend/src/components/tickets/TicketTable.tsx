@@ -16,12 +16,14 @@ interface TicketTableProps {
   tickets: Ticket[];
   onTicketClick?: (ticket: Ticket) => void;
   className?: string;
+  renderActions?: (ticket: Ticket) => React.ReactNode;
 }
 
 const TicketTable: React.FC<TicketTableProps> = ({ 
   tickets, 
   onTicketClick,
-  className = '' 
+  className = '',
+  renderActions,
 }) => {
   return (
     <div className={className} style={{
@@ -43,6 +45,7 @@ const TicketTable: React.FC<TicketTableProps> = ({
                 <TableCell header>PRIORITY</TableCell>
                 <TableCell header>DUE DATE</TableCell>
                 <TableCell header>REQUESTING EMPLOYEE</TableCell>
+                {renderActions && <TableCell header>ACTIONS</TableCell>}
               </TableRow>
             </TableHeader>
         <TableBody>
@@ -50,6 +53,7 @@ const TicketTable: React.FC<TicketTableProps> = ({
             <TicketRow
               key={ticket.id}
               ticket={ticket}
+              actions={renderActions?.(ticket)}
               onClick={onTicketClick}
             />
           ))}

@@ -12,4 +12,18 @@ export const api = axios.create({
   },
 });
 
+// Inject Authorization header from localStorage token
+api.interceptors.request.use((config) => {
+  try {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    if (token) {
+      config.headers = config.headers || {};
+      Reflect.set(config.headers as object, 'Authorization', `Bearer ${token}`);
+    }
+  } catch {
+    // ignore
+  }
+  return config;
+});
+
 export default api;

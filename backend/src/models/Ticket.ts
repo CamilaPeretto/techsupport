@@ -5,10 +5,14 @@ export interface ITicket extends Document {
   title: string;
   description?: string;
   status: "aberto" | "em andamento" | "concluído";
+  type?: "hardware" | "software" | "rede" | "outros";
   createdAt: Date;
   userId: mongoose.Types.ObjectId;
   assignedTo?: mongoose.Types.ObjectId; // Técnico responsável
   priority?: "baixa" | "média" | "alta";
+  resolution?: string;
+  resolvedAt?: Date | null;
+  resolutionNotes?: { text: string; at: Date; by?: mongoose.Types.ObjectId }[];
   updatedAt: Date;
 }
 
@@ -29,6 +33,11 @@ const TicketSchema: Schema = new Schema(
       enum: ["aberto", "em andamento", "concluído"],
       default: "aberto",
     },
+    type: {
+      type: String,
+      enum: ["hardware", "software", "rede", "outros"],
+      default: "outros",
+    },
     userId: {
       type: Schema.Types.ObjectId,
       ref: "User",
@@ -43,6 +52,22 @@ const TicketSchema: Schema = new Schema(
       enum: ["baixa", "média", "alta"],
       default: "média",
     },
+    resolution: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    resolvedAt: {
+      type: Date,
+      default: null,
+    },
+    resolutionNotes: [
+      {
+        text: { type: String, required: true, trim: true },
+        at: { type: Date, default: Date.now },
+        by: { type: Schema.Types.ObjectId, ref: 'User' },
+      },
+    ],
   },
   {
     timestamps: true,

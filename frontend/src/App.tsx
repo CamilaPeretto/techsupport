@@ -7,6 +7,8 @@ import MyTickets from "./pages/MyTickets";
 import StatusUpdateModal from "./components/StatusUpdateModal";
 import Profile from "./pages/Profile";
 import Schedule from "./pages/Schedule";
+import ProtectedRoute from "./routes/ProtectedRoute";
+import TicketDetail from "./pages/TicketDetail";
 
 function App() {
   return (
@@ -15,10 +17,11 @@ function App() {
       <Routes>
         <Route path="/" element={<DashboardTest />} />
         <Route path="/login" element={<Login/>} />
-        <Route path="/tickets" element={<Tickets />} />
-        <Route path="/my-tickets" element={<MyTickets />} />
-  <Route path="/profile" element={<Profile />} />
-  <Route path="/schedule" element={<Schedule />} />
+        <Route path="/tickets" element={<ProtectedRoute><Tickets /></ProtectedRoute>} />
+        <Route path="/tickets/:id" element={<ProtectedRoute><TicketDetail /></ProtectedRoute>} />
+        <Route path="/my-tickets" element={<ProtectedRoute><MyTickets /></ProtectedRoute>} />
+        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+        <Route path="/schedule" element={<ProtectedRoute><Schedule /></ProtectedRoute>} />
       </Routes>
     </Router>
   );

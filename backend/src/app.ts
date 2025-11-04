@@ -15,6 +15,7 @@ import dotenv from "dotenv";
 // Importa as rotas
 import userRoutes from "./routes/userRoutes";
 import ticketRoutes from "./routes/ticketRoutes";
+import auth from "./middleware/auth";
 
 dotenv.config();
 
@@ -51,9 +52,10 @@ app.use(limiter);
 
 // ---------- ROTAS ----------
 app.use("/api", userRoutes);
-app.use("/api/tickets", ticketRoutes);
-app.use("/api/ticket", ticketRoutes); // Alias para compatibilidade
-app.use("/api/tecnico/tickets", ticketRoutes); // Rota para técnicos
+// Protege as rotas de tickets
+app.use("/api/tickets", auth, ticketRoutes);
+app.use("/api/ticket", auth, ticketRoutes); // Alias para compatibilidade
+app.use("/api/tecnico/tickets", auth, ticketRoutes); // Rota para técnicos
 
 // ---------- ROTAS BÁSICAS ----------
 // Rota inicial apenas para teste, retorna mensagem de status

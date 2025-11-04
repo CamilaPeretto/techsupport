@@ -5,7 +5,7 @@ import mongoose from "mongoose";
 // Controlador para criar um novo ticket
 export const createTicket = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { title, description, userId, priority } = req.body;
+    const { title, description, userId, priority, type } = req.body;
 
     // Validação
     if (!title || !userId) {
@@ -18,6 +18,7 @@ export const createTicket = async (req: Request, res: Response): Promise<void> =
       description,
       userId,
       priority: priority || "média",
+      type: type || "outros",
     });
 
     res.status(201).json({
@@ -32,11 +33,14 @@ export const createTicket = async (req: Request, res: Response): Promise<void> =
 // Controlador para listar todos os tickets
 export const getAllTickets = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { assignedTo, userId, status, priority } = req.query as {
+    const { assignedTo, userId, status, priority, type, fromDate, toDate } = req.query as {
       assignedTo?: string;
       userId?: string;
       status?: string;
       priority?: string;
+      type?: string;
+      fromDate?: string;
+      toDate?: string;
     };
 
     const filter: Record<string, unknown> = {};
@@ -44,6 +48,12 @@ export const getAllTickets = async (req: Request, res: Response): Promise<void> 
     if (userId) filter.userId = userId;
     if (status) filter.status = status;
     if (priority) filter.priority = priority;
+    if (type) filter.type = type;
+    if (fromDate || toDate) {
+      filter.createdAt = {} as any;
+      if (fromDate) (filter.createdAt as any).$gte = new Date(fromDate);
+      if (toDate) (filter.createdAt as any).$lte = new Date(toDate);
+    }
 
     const tickets = await Ticket.find(filter)
       .populate("userId", "name email role")
@@ -85,7 +95,7 @@ export const getTicketById = async (req: Request, res: Response): Promise<void> 
 export const updateTicketStatus = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const { status } = req.body;
+    const { status, resolution } = req.body as { status: string; resolution?: string };
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       res.status(400).json({ message: "ID do ticket inválido" });
@@ -97,11 +107,15 @@ export const updateTicketStatus = async (req: Request, res: Response): Promise<v
       return;
     }
 
+    const update: any = { status };
+    if (resolution !== undefined) update.resolution = resolution;
+    if (status === "concluído") update.resolvedAt = new Date();
+
     const ticketAtualizado = await Ticket.findByIdAndUpdate(
       id,
-      { status },
+      update,
       { new: true }
-    ).populate("userId", "name email role");
+    ).populate("userId", "name email role").populate("assignedTo", "name email");
 
     if (!ticketAtualizado) {
       res.status(404).json({ message: "Ticket não encontrado" });
@@ -125,6 +139,13 @@ export const assignTicket = async (req: Request, res: Response): Promise<void> =
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       res.status(400).json({ message: "ID do ticket inválido" });
+      return;
+    }
+
+    // Autorização simples: apenas técnicos podem atribuir
+    const currentUser = (req as any).user as { id: string; role?: string } | undefined;
+    if (currentUser && currentUser.role && currentUser.role !== 'tech' && currentUser.role !== 'admin') {
+      res.status(403).json({ message: "Apenas técnicos podem atribuir tickets" });
       return;
     }
 

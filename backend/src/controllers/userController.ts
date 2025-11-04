@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import User from "../models/User";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 // Controlador para registrar um novo usuário
 export const registerUser = async (req: Request, res: Response): Promise<void> => {
@@ -58,8 +59,17 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      res.status(500).json({ message: "JWT_SECRET não configurado" });
+      return;
+    }
+
+  const token = jwt.sign({ sub: (user._id as any).toString(), role: user.role }, secret, { expiresIn: '1h' });
+
     res.status(200).json({
       message: "Login realizado com sucesso",
+      token,
       user: {
         id: user._id,
         name: user.name,
