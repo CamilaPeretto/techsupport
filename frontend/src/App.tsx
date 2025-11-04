@@ -18,8 +18,8 @@ function App() {
     <Router>
       <StatusUpdateModal />
       <Routes>
-        <Route path="/" element={<DashboardTest />} />
-        <Route path="/login" element={<Login/>} />
+        <Route path="/" element={<Login/>} />
+        <Route path="/dashboard" element={<ProtectedRoute><DashboardTest /></ProtectedRoute>} />
         <Route path="/tickets" element={<ProtectedRoute><Tickets /></ProtectedRoute>} />
         <Route path="/tickets/:id" element={<ProtectedRoute><TicketDetail /></ProtectedRoute>} />
         <Route path="/my-tickets" element={<ProtectedRoute><MyTickets /></ProtectedRoute>} />

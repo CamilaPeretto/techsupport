@@ -10,7 +10,7 @@ const ProtectedRoute: React.FC<Props> = ({ children }) => {
   const location = useLocation();
 
   if (!isAuthed && !token) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/" state={{ from: location }} replace />;
   }
   return children;
 };

@@ -194,3 +194,34 @@ h1, h2, h3, h4, h5, h6 {
 ::-webkit-scrollbar-thumb:hover {
   background: #d020e0;
 }
+
+/* Placeholder styling - garantir que não fique preto */
+input::placeholder,
+textarea::placeholder {
+  color: #6272A4 !important;
+  opacity: 0.7;
+}
+
+input::-webkit-input-placeholder,
+textarea::-webkit-input-placeholder {
+  color: #6272A4 !important;
+  opacity: 0.7;
+}
+
+input:-moz-placeholder,
+textarea:-moz-placeholder {
+  color: #6272A4 !important;
+  opacity: 0.7;
+}
+
+input::-moz-placeholder,
+textarea::-moz-placeholder {
+  color: #6272A4 !important;
+  opacity: 0.7;
+}
+
+input:-ms-input-placeholder,
+textarea:-ms-input-placeholder {
+  color: #6272A4 !important;
+  opacity: 0.7;
+}
