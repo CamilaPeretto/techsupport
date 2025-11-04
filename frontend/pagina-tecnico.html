@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel do Técnico - TechSupport</title>
+</head>
+<body>
+  <h1>Painel de Tickets</h1>
+  
+  <table id="ticketsTable" border="1">
+    <thead>
+      <tr>
+        <th>Título</th>
+        <th>Descrição</th>
+        <th>Status</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody id="ticketsBody"></tbody>
+  </table>
+
+  <h2>Criar Novo Usuário</h2>
+<form id="formUsuario">
+  <label>Nome:</label>
+  <input type="text" id="nomeUsuario" required><br><br>
+
+  <label>Senha:</label>
+  <input type="password" id="senhaUsuario" required><br><br>
+
+  <label>Função:</label>
+  <select id="roleUsuario" required>
+    <option value="Funcionário">Funcionário</option>
+    <option value="Técnico">Técnico</option>
+  </select><br><br>
+
+  <button type="submit">Criar Usuário</button>
+</form>
+
+  <script src="scripts.js"></script>
+</body>
+</html>
