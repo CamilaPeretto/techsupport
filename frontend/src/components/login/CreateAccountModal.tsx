@@ -1,6 +1,6 @@
-// Modal para criar uma nova conta
 import { useState, FormEvent } from 'react';
 import { Modal, Form, Button, Toast, ToastContainer } from 'react-bootstrap';
+import api from '../../services/api';
 
 interface CreateAccountModalProps {
   show: boolean;
@@ -9,7 +9,6 @@ interface CreateAccountModalProps {
 
 interface FormData {
   name: string;
-  username: string;
   email: string;
   password: string;
   confirmPassword: string;
@@ -19,7 +18,6 @@ const CreateAccountModal = ({ show, onHide }: CreateAccountModalProps) => {
   // Estado que armazena todos os dados do formulário
   const [formData, setFormData] = useState<FormData>({
     name: '',
-    username: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -43,11 +41,11 @@ const CreateAccountModal = ({ show, onHide }: CreateAccountModalProps) => {
   };
 
   // Função que processa o envio do formulário
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     // Validação 1: Verifica se todos os campos estão preenchidos
-    if (!formData.name || !formData.username || !formData.email || !formData.password || !formData.confirmPassword) {
+    if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
       showMessage('Por favor, preencha todos os campos.');
       return;
     }
@@ -70,20 +68,29 @@ const CreateAccountModal = ({ show, onHide }: CreateAccountModalProps) => {
       return;
     }
 
-    // AQUI você conectaria com a API usando Axios para criar a conta
-    showMessage('Conta criada com sucesso!', 'success');
-    
-    // Limpa os campos e fecha o modal após 1 segundo
-    setTimeout(() => {
-      setFormData({
-        name: '',
-        username: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
+    // Chama API para criar conta
+    try {
+      await api.post('/api/register', {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
       });
-      onHide();
-    }, 1000);
+      showMessage('Conta criada com sucesso!', 'success');
+      
+      // Limpa os campos e fecha o modal após 1 segundo
+      setTimeout(() => {
+        setFormData({
+          name: '',
+          email: '',
+          password: '',
+          confirmPassword: '',
+        });
+        onHide();
+      }, 1000);
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : 'Erro ao criar conta';
+      showMessage(msg);
+    }
   };
 
   return (
@@ -105,25 +112,9 @@ const CreateAccountModal = ({ show, onHide }: CreateAccountModalProps) => {
               <Form.Label>Nome</Form.Label>
               <Form.Control
                 type="text"
-                placeholder="Seu nome completo"
+                placeholder=""
                 value={formData.name}
                 onChange={(e) => handleChange('name', e.target.value)}
-                style={{
-                  backgroundColor: '#28282E',
-                  borderColor: '#212121',
-                  color: 'white',
-                }}
-              />
-            </Form.Group>
-
-            {/* Campo Username */}
-            <Form.Group className="mb-3">
-              <Form.Label>Username</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="seu_username"
-                value={formData.username}
-                onChange={(e) => handleChange('username', e.target.value)}
                 style={{
                   backgroundColor: '#28282E',
                   borderColor: '#212121',
@@ -137,7 +128,7 @@ const CreateAccountModal = ({ show, onHide }: CreateAccountModalProps) => {
               <Form.Label>Email</Form.Label>
               <Form.Control
                 type="email"
-                placeholder="seu@email.com"
+                placeholder=""
                 value={formData.email}
                 onChange={(e) => handleChange('email', e.target.value)}
                 style={{
@@ -153,7 +144,7 @@ const CreateAccountModal = ({ show, onHide }: CreateAccountModalProps) => {
               <Form.Label>Senha</Form.Label>
               <Form.Control
                 type="password"
-                placeholder="••••••••"
+                placeholder=""
                 value={formData.password}
                 onChange={(e) => handleChange('password', e.target.value)}
                 style={{
@@ -169,7 +160,7 @@ const CreateAccountModal = ({ show, onHide }: CreateAccountModalProps) => {
               <Form.Label>Confirmar Senha</Form.Label>
               <Form.Control
                 type="password"
-                placeholder="••••••••"
+                placeholder=""
                 value={formData.confirmPassword}
                 onChange={(e) => handleChange('confirmPassword', e.target.value)}
                 style={{

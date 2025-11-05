@@ -1,4 +1,5 @@
 import React from 'react';
+import { useAppSelector } from '../../hooks/useRedux';
 
 interface StatsCardProps {
   title: string;
@@ -13,14 +14,21 @@ const StatsCard: React.FC<StatsCardProps> = ({
   className = '',
   icon 
 }) => {
+  const user = useAppSelector(s => s.auth.user);
+  const isTech = user?.role === 'tech';
+
   return (
     <div className={className} style={{ 
-      backgroundColor: "var(--color-secondary-bluish-gray)",
-      border: "1px solid var(--color-secondary-dark-gray)",
+      backgroundColor: isTech ? "var(--preto)" : "var(--color-secondary-bluish-gray)",
+      border: isTech ? "1px solid var(--magenta)" : "1px solid var(--color-secondary-dark-gray)",
       borderRadius: "8px",
       padding: "1.5rem",
       textAlign: "center",
-      boxShadow: "var(--shadow-base)"
+      boxShadow: isTech ? "0 0 12px rgba(230, 39, 248, 0.4)" : "var(--shadow-base)",
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
+      minHeight: "140px"
     }}>
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
         {icon && (

@@ -38,14 +38,8 @@ const ForgotPasswordModal = ({ show, onHide }: ForgotPasswordModalProps) => {
       return;
     }
 
-    // AQUI você conectaria com a API usando Axios para enviar email de recuperação
-    showMessage('Email de recuperação enviado com sucesso!', 'success');
-    
-    // Limpa o campo e fecha o modal após 1 segundo
-    setTimeout(() => {
-      setEmail('');
-      onHide();
-    }, 1000);
+    // Funcionalidade de recuperação de senha ainda não implementada no backend
+    showMessage('Funcionalidade de recuperação de senha em desenvolvimento. Entre em contato com o suporte.', 'danger');
   };
 
   return (

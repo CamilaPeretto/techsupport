@@ -4,6 +4,7 @@ import CustomBadge from '../ui/CustomBadge';
 
 interface Ticket {
   id: string;
+  ticketNumber?: number;
   title: string;
   status: 'open' | 'in-progress' | 'completed' | 'pending';
   priority: 'low' | 'medium' | 'high';
@@ -21,13 +22,13 @@ const TicketRow: React.FC<TicketRowProps> = ({ ticket, onClick }) => {
   const getStatusText = (status: string) => {
     switch (status) {
       case 'open':
-        return 'Open';
+        return 'Aberto';
       case 'pending':
-        return 'Pending';
+        return 'Pendente';
       case 'in-progress':
-        return 'In Progress';
+        return 'Em Andamento';
       case 'completed':
-        return 'Completed';
+        return 'Concluído';
       default:
         return status;
     }
@@ -36,11 +37,11 @@ const TicketRow: React.FC<TicketRowProps> = ({ ticket, onClick }) => {
   const getPriorityText = (priority: string) => {
     switch (priority) {
       case 'high':
-        return 'High';
+        return 'Alta';
       case 'medium':
-        return 'Medium';
+        return 'Média';
       case 'low':
-        return 'Low';
+        return 'Baixa';
       default:
         return priority;
     }
@@ -57,7 +58,9 @@ const TicketRow: React.FC<TicketRowProps> = ({ ticket, onClick }) => {
           color: 'var(--color-primary-magenta)',
           fontWeight: 500
         }}>
-          #{ticket.id}
+          {ticket.ticketNumber !== undefined && ticket.ticketNumber !== null
+            ? `#${ticket.ticketNumber}`
+            : `#${ticket.id.slice(-6)}`}
         </span>
       </TableCell>
       <TableCell>
@@ -74,11 +77,16 @@ const TicketRow: React.FC<TicketRowProps> = ({ ticket, onClick }) => {
         </CustomBadge>
       </TableCell>
       <TableCell>
-        <span style={{ 
-          color: 'var(--color-primary-white)',
-          fontFamily: 'var(--font-family-secondary)'
-        }}>
+        <CustomBadge type="priority" value={ticket.priority}>
           {getPriorityText(ticket.priority)}
+        </CustomBadge>
+      </TableCell>
+      <TableCell>
+        <span style={{ 
+          color: 'var(--color-primary-white)',
+          fontFamily: 'var(--font-family-secondary)'
+        }}>
+          {ticket.dueDate || '-'}
         </span>
       </TableCell>
       <TableCell>
@@ -86,15 +94,7 @@ const TicketRow: React.FC<TicketRowProps> = ({ ticket, onClick }) => {
           color: 'var(--color-primary-white)',
           fontFamily: 'var(--font-family-secondary)'
         }}>
-          {ticket.dueDate || ticket.assignedTechnician}
-        </span>
-      </TableCell>
-      <TableCell>
-        <span style={{ 
-          color: 'var(--color-primary-white)',
-          fontFamily: 'var(--font-family-secondary)'
-        }}>
-          {ticket.requestingEmployee || ticket.assignedTechnician}
+          {ticket.assignedTechnician || '-'}
         </span>
       </TableCell>
     </TableRow>

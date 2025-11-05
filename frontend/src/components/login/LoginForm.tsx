@@ -7,6 +7,8 @@ import CreateAccountModal from './CreateAccountModal';
 import ForgotPasswordModal from './ForgotPasswordModal';
 import LoginErrorModal from './LoginErrorModal';
 import { useAppDispatch, useAppSelector } from '../../hooks/useRedux';
+import api from '../../services/api';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const LoginForm = () => {
   // Estados locais para controlar os campos do formulário
@@ -25,9 +27,11 @@ const LoginForm = () => {
   // Redux hooks
   const dispatch = useAppDispatch();
   const { loading } = useAppSelector((state) => state.auth);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   // Função que valida e processa o login
-  const handleLogin = (e: FormEvent) => {
+  const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
 
     dispatch(loginStart());
@@ -56,12 +60,31 @@ const LoginForm = () => {
       return;
     }
 
-    // AQUI você conectaria com a API real usando Axios
-    // Simulação de login bem-sucedido
-    setTimeout(() => {
-      dispatch(loginSuccess({ email, name: 'Usuário' }));
+    try {
+      const { data } = await api.post('/api/login', { email, password });
+      const { token, user } = data;
+      if (token) {
+        localStorage.setItem('token', token);
+      }
+      dispatch(loginSuccess({ 
+        id: user.id, 
+        email: user.email, 
+        name: user.name, 
+        role: user.role,
+        department: user.department,
+        position: user.position
+      }));
       setShowToast(true);
-    }, 500);
+      const defaultPath = user?.role === 'tech' ? '/tickets' : '/my-tickets';
+      const from = (location.state as { from?: { pathname?: string } } | null | undefined)?.from?.pathname || defaultPath;
+      // pequeno delay para o toast aparecer rapidamente
+      setTimeout(() => navigate(from, { replace: true }), 300);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Falha no login';
+      setErrorMessage(message);
+      setShowLoginError(true);
+      dispatch(loginFailure(message));
+    }
   };
 
   return (

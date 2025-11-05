@@ -9,7 +9,7 @@ interface StatusState {
 
 const initialState: StatusState = {
   currentStatus: 'Pendente',
-  isModalOpen: true,
+  isModalOpen: false,
 };
 
 const statusSlice = createSlice({

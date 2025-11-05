@@ -3,15 +3,18 @@ import api from '../services/api';
 
 export type TicketStatus = 'aberto' | 'em andamento' | 'concluído';
 export type TicketPriority = 'baixa' | 'média' | 'alta';
+export type TicketType = 'hardware' | 'software' | 'rede' | 'outros';
 
 export interface Ticket {
   _id: string;
+  ticketNumber?: number;
   title: string;
   description?: string;
   status: TicketStatus;
   userId: string;
   assignedTo?: { _id: string; name: string; email: string } | null;
   priority?: TicketPriority;
+  type?: TicketType;
   createdAt: string;
   updatedAt: string;
 }
@@ -30,7 +33,19 @@ const initialState: TicketsState = {
   selectedTicketId: null,
 };
 
-export const fetchTickets = createAsyncThunk<Ticket[], { assignedTo?: string; userId?: string; status?: TicketStatus; priority?: TicketPriority } | undefined>(
+export const fetchTickets = createAsyncThunk<
+  Ticket[],
+  | {
+      assignedTo?: string;
+      userId?: string;
+      status?: TicketStatus;
+      priority?: TicketPriority;
+      type?: TicketType;
+      fromDate?: string;
+      toDate?: string;
+    }
+  | undefined
+>(
   'tickets/fetch',
   async (params) => {
     const { data } = await api.get<Ticket[]>('/api/tickets', { params });
@@ -46,10 +61,10 @@ export const createTicket = createAsyncThunk<Ticket, { title: string; descriptio
   }
 );
 
-export const updateTicketStatus = createAsyncThunk<Ticket, { id: string; status: TicketStatus }>(
+export const updateTicketStatus = createAsyncThunk<Ticket, { id: string; status: TicketStatus; resolution?: string }>(
   'tickets/updateStatus',
-  async ({ id, status }) => {
-    const { data } = await api.put<{ ticket: Ticket }>(`/api/tickets/${id}/status`, { status });
+  async ({ id, status, resolution }) => {
+    const { data } = await api.put<{ ticket: Ticket }>(`/api/tickets/${id}/status`, { status, resolution });
     return data.ticket;
   }
 );

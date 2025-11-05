@@ -1,23 +1,47 @@
+/// <reference path="../types/express.d.ts" />
 import { Request, Response } from "express";
 import Ticket from "../models/Ticket";
+import Counter from "../models/Counter";
 import mongoose from "mongoose";
 
 // Controlador para criar um novo ticket
 export const createTicket = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { title, description, userId, priority } = req.body;
+    const { title, description, priority, type } = req.body;
 
     // Validação
-    if (!title || !userId) {
-      res.status(400).json({ message: "Título e userId são obrigatórios" });
+    if (!title) {
+      res.status(400).json({ message: "Título é obrigatório" });
       return;
     }
 
+    // Usa o ID do usuário autenticado
+    if (!req.user || !req.user.id) {
+      res.status(401).json({ message: "Usuário não autenticado" });
+      return;
+    }
+
+    // Gera um número sequencial para o ticket
+    const next = await Counter.findOneAndUpdate(
+      { _id: 'ticketNumber' },
+      { $inc: { seq: 1 } },
+      { upsert: true, new: true }
+    );
+
     const newTicket = await Ticket.create({
+      ticketNumber: next?.seq,
       title,
       description,
-      userId,
+      userId: req.user.id,
       priority: priority || "média",
+      type: type || "outros",
+      statusHistory: [
+        {
+          status: "aberto",
+          changedAt: new Date(),
+          changedBy: req.user.id,
+        }
+      ]
     });
 
     res.status(201).json({
@@ -32,18 +56,35 @@ export const createTicket = async (req: Request, res: Response): Promise<void> =
 // Controlador para listar todos os tickets
 export const getAllTickets = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { assignedTo, userId, status, priority } = req.query as {
+    const { assignedTo, userId, status, priority, type, fromDate, toDate } = req.query as {
       assignedTo?: string;
       userId?: string;
       status?: string;
       priority?: string;
+      type?: string;
+      fromDate?: string;
+      toDate?: string;
     };
 
     const filter: Record<string, unknown> = {};
-    if (assignedTo) filter.assignedTo = assignedTo;
-    if (userId) filter.userId = userId;
+    
+    // Se o usuário não é técnico, só pode ver seus próprios tickets
+    if (req.user && req.user.role !== "tech") {
+      filter.userId = req.user.id;
+    } else {
+      // Técnicos podem filtrar por qualquer userId ou assignedTo
+      if (assignedTo) filter.assignedTo = assignedTo;
+      if (userId) filter.userId = userId;
+    }
+    
     if (status) filter.status = status;
     if (priority) filter.priority = priority;
+    if (type) filter.type = type;
+    if (fromDate || toDate) {
+      filter.createdAt = {} as any;
+      if (fromDate) (filter.createdAt as any).$gte = new Date(fromDate);
+      if (toDate) (filter.createdAt as any).$lte = new Date(toDate);
+    }
 
     const tickets = await Ticket.find(filter)
       .populate("userId", "name email role")
@@ -68,11 +109,21 @@ export const getTicketById = async (req: Request, res: Response): Promise<void> 
 
     const ticket = await Ticket.findById(id)
       .populate("userId", "name email role")
-      .populate("assignedTo", "name email");
+        .populate("assignedTo", "name email")
+        .populate("statusHistory.changedBy", "name");
 
     if (!ticket) {
       res.status(404).json({ message: "Ticket não encontrado" });
       return;
+    }
+
+    // Verifica se o usuário tem permissão para ver este ticket
+    // Técnicos podem ver todos, usuários só podem ver seus próprios
+    if (req.user && req.user.role !== "tech") {
+      if (ticket.userId._id.toString() !== req.user.id) {
+        res.status(403).json({ message: "Você não tem permissão para ver este ticket" });
+        return;
+      }
     }
 
     res.status(200).json(ticket);
@@ -85,7 +136,7 @@ export const getTicketById = async (req: Request, res: Response): Promise<void> 
 export const updateTicketStatus = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const { status } = req.body;
+    const { status, resolution } = req.body as { status: string; resolution?: string };
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       res.status(400).json({ message: "ID do ticket inválido" });
@@ -97,11 +148,34 @@ export const updateTicketStatus = async (req: Request, res: Response): Promise<v
       return;
     }
 
+    // Buscar o ticket primeiro para verificar o estado atual
+    const ticket = await Ticket.findById(id);
+    if (!ticket) {
+      res.status(404).json({ message: "Ticket não encontrado" });
+      return;
+    }
+
+    const update: any = { status };
+    if (resolution !== undefined) update.resolution = resolution;
+    if (status === "concluído") update.resolvedAt = new Date();
+    if (status === "em andamento" && !ticket.inProgressAt) {
+      update.inProgressAt = new Date();
+    }
+    
+    // Adiciona o evento ao histórico
+    update.$push = {
+      statusHistory: {
+        status,
+        changedAt: new Date(),
+        changedBy: req.user?.id,
+      }
+    };
+
     const ticketAtualizado = await Ticket.findByIdAndUpdate(
       id,
-      { status },
+      update,
       { new: true }
-    ).populate("userId", "name email role");
+    ).populate("userId", "name email role").populate("assignedTo", "name email");
 
     if (!ticketAtualizado) {
       res.status(404).json({ message: "Ticket não encontrado" });
@@ -128,9 +202,32 @@ export const assignTicket = async (req: Request, res: Response): Promise<void> =
       return;
     }
 
+    // Já verificado pelo middleware requireTech, mas mantém verificação defensiva
+    if (!req.user || req.user.role !== 'tech') {
+      res.status(403).json({ message: "Apenas técnicos podem atribuir tickets" });
+      return;
+    }
+
+    // Busca o técnico para obter o nome
+    const User = mongoose.model('User');
+    const technician = await User.findById(assignedTo).select('name');
+    
     const ticket = await Ticket.findByIdAndUpdate(
       id,
-      { assignedTo, status: "em andamento" },
+      { 
+        assignedTo, 
+        status: "em andamento",
+        assignedAt: new Date(),
+        inProgressAt: new Date(),
+        $push: {
+          statusHistory: {
+            status: "atribuído",
+            changedAt: new Date(),
+            changedBy: req.user.id,
+            assignedTechnicianName: technician?.name || 'Técnico',
+          }
+        }
+      },
       { new: true }
     ).populate("assignedTo", "name email");
 

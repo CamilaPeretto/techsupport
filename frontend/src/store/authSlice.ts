@@ -6,6 +6,9 @@ export interface User {
   id?: string;
   email: string;
   name: string;
+  role?: "user" | "tech" | "admin";
+  department?: string;
+  position?: string;
 }
 
 // Interface para o estado de autenticação

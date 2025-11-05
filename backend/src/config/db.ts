@@ -17,7 +17,7 @@ async function connectDB(): Promise<void> {
   try {
     // Faz a conexão com o banco no MongoDB Atlas usando credenciais e URI
     await mongoose.connect(
-      `mongodb+srv://${dbUser}:${dbPassword}@cluster0.cb7ikw0.mongodb.net/techsupport?retryWrites=true&w=majority&appName=Cluster0`
+      `mongodb+srv://${dbUser}:${dbPassword}@cluster0.cb7ikw0.mongodb.net/TechSupport?retryWrites=true&w=majority&appName=Cluster0`
     );
     // Se der certo, exibe uma mensagem no console
     console.log("Conectou ao banco de dados!");
