@@ -6,6 +6,9 @@ import jwt from "jsonwebtoken";
 // Controlador para registrar um novo usuário
 export const registerUser = async (req: Request, res: Response): Promise<void> => {
   try {
+    console.log('📥 Recebendo requisição de registro');
+    console.log('📦 Body completo:', JSON.stringify(req.body, null, 2));
+    
     const { name, email, password, role } = req.body;
 
     console.log('📝 Tentando registrar usuário:', { name, email, role });
@@ -116,6 +119,31 @@ export const getAllUsers = async (_req: Request, res: Response): Promise<void> =
     res.status(200).json(users);
   } catch (error) {
     res.status(500).json({ message: "Erro ao buscar usuários", error });
+  }
+};
+
+// Obter dados do usuário autenticado
+export const getCurrentUser = async (req: Request, res: Response): Promise<void> => {
+  try {
+    if (!req.user || !req.user.id) {
+      res.status(401).json({ message: "Usuário não autenticado" });
+      return;
+    }
+    const user = await User.findById(req.user.id).select("-password");
+    if (!user) {
+      res.status(404).json({ message: "Usuário não encontrado" });
+      return;
+    }
+    res.status(200).json({
+      id: user._id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      department: user.department,
+      position: user.position
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Erro ao buscar usuário", error });
   }
 };
 

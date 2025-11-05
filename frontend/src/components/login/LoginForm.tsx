@@ -66,9 +66,17 @@ const LoginForm = () => {
       if (token) {
         localStorage.setItem('token', token);
       }
-      dispatch(loginSuccess({ id: user.id, email: user.email, name: user.name }));
+      dispatch(loginSuccess({ 
+        id: user.id, 
+        email: user.email, 
+        name: user.name, 
+        role: user.role,
+        department: user.department,
+        position: user.position
+      }));
       setShowToast(true);
-  const from = (location.state as { from?: { pathname?: string } } | null | undefined)?.from?.pathname || '/tickets';
+      const defaultPath = user?.role === 'tech' ? '/tickets' : '/my-tickets';
+      const from = (location.state as { from?: { pathname?: string } } | null | undefined)?.from?.pathname || defaultPath;
       // pequeno delay para o toast aparecer rapidamente
       setTimeout(() => navigate(from, { replace: true }), 300);
     } catch (err) {

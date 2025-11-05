@@ -49,7 +49,7 @@ const Table: React.FC<TableProps> = ({ children, className = '', ...props }) => 
 const TableHeader: React.FC<TableHeaderProps> = ({ children, className = '', ...props }) => {
   return (
     <thead className={className} style={{
-      backgroundColor: "#4A4A6A",
+      backgroundColor: "var(--magenta)",
       display: "table-header-group",
       position: "sticky",
       top: 0,

@@ -7,6 +7,7 @@ export type TicketType = 'hardware' | 'software' | 'rede' | 'outros';
 
 export interface Ticket {
   _id: string;
+  ticketNumber?: number;
   title: string;
   description?: string;
   status: TicketStatus;

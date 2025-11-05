@@ -39,6 +39,13 @@ app.use(cookieParser());
 // Loga requisições HTTP no terminal no formato "dev" (ex: GET /api 200 32ms)
 app.use(morgan("dev"));
 
+// Log detalhado de todas as requisições
+app.use((req, _res, next) => {
+  console.log(`\n🔵 ${req.method} ${req.url}`);
+  console.log('📦 Body:', JSON.stringify(req.body, null, 2));
+  next();
+});
+
 // ---------- RATE LIMITING ----------
 // Configura um limite de 100 requisições por IP a cada 15 minutos
 const limiter = rateLimit({

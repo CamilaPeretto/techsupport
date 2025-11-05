@@ -1,6 +1,7 @@
 /// <reference path="../types/express.d.ts" />
 import { Request, Response } from "express";
 import Ticket from "../models/Ticket";
+import Counter from "../models/Counter";
 import mongoose from "mongoose";
 
 // Controlador para criar um novo ticket
@@ -20,12 +21,27 @@ export const createTicket = async (req: Request, res: Response): Promise<void> =
       return;
     }
 
+    // Gera um número sequencial para o ticket
+    const next = await Counter.findOneAndUpdate(
+      { _id: 'ticketNumber' },
+      { $inc: { seq: 1 } },
+      { upsert: true, new: true }
+    );
+
     const newTicket = await Ticket.create({
+      ticketNumber: next?.seq,
       title,
       description,
       userId: req.user.id,
       priority: priority || "média",
       type: type || "outros",
+      statusHistory: [
+        {
+          status: "aberto",
+          changedAt: new Date(),
+          changedBy: req.user.id,
+        }
+      ]
     });
 
     res.status(201).json({
@@ -93,7 +109,8 @@ export const getTicketById = async (req: Request, res: Response): Promise<void> 
 
     const ticket = await Ticket.findById(id)
       .populate("userId", "name email role")
-      .populate("assignedTo", "name email");
+        .populate("assignedTo", "name email")
+        .populate("statusHistory.changedBy", "name");
 
     if (!ticket) {
       res.status(404).json({ message: "Ticket não encontrado" });
@@ -131,9 +148,28 @@ export const updateTicketStatus = async (req: Request, res: Response): Promise<v
       return;
     }
 
+    // Buscar o ticket primeiro para verificar o estado atual
+    const ticket = await Ticket.findById(id);
+    if (!ticket) {
+      res.status(404).json({ message: "Ticket não encontrado" });
+      return;
+    }
+
     const update: any = { status };
     if (resolution !== undefined) update.resolution = resolution;
     if (status === "concluído") update.resolvedAt = new Date();
+    if (status === "em andamento" && !ticket.inProgressAt) {
+      update.inProgressAt = new Date();
+    }
+    
+    // Adiciona o evento ao histórico
+    update.$push = {
+      statusHistory: {
+        status,
+        changedAt: new Date(),
+        changedBy: req.user?.id,
+      }
+    };
 
     const ticketAtualizado = await Ticket.findByIdAndUpdate(
       id,
@@ -172,9 +208,26 @@ export const assignTicket = async (req: Request, res: Response): Promise<void> =
       return;
     }
 
+    // Busca o técnico para obter o nome
+    const User = mongoose.model('User');
+    const technician = await User.findById(assignedTo).select('name');
+    
     const ticket = await Ticket.findByIdAndUpdate(
       id,
-      { assignedTo, status: "em andamento" },
+      { 
+        assignedTo, 
+        status: "em andamento",
+        assignedAt: new Date(),
+        inProgressAt: new Date(),
+        $push: {
+          statusHistory: {
+            status: "atribuído",
+            changedAt: new Date(),
+            changedBy: req.user.id,
+            assignedTechnicianName: technician?.name || 'Técnico',
+          }
+        }
+      },
       { new: true }
     ).populate("assignedTo", "name email");
 

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { registerUser, loginUser, getAllUsers, getUserById, updateUser } from "../controllers/userController";
+import { registerUser, loginUser, getAllUsers, getUserById, updateUser, getCurrentUser } from "../controllers/userController";
 import auth from "../middleware/auth";
 
 const router = Router();
@@ -9,6 +9,9 @@ router.post("/register", registerUser);
 
 // Rota para login
 router.post("/login", loginUser);
+
+// Rota para obter dados do usuário autenticado
+router.get("/me", auth, getCurrentUser);
 
 // Rota para listar usuários
 router.get("/users", auth, getAllUsers);

@@ -15,16 +15,16 @@ const CustomBadge: React.FC<CustomBadgeProps> = ({
 }) => {
   const getBadgeStyle = (): React.CSSProperties => {
     const statusColors: Record<string, { bg: string; text: string }> = {
-      'open': { bg: 'rgba(255, 0, 7, 0.2)', text: '#FF0007' },
-      'pending': { bg: 'rgba(255, 0, 7, 0.2)', text: '#FF0007' },
-      'in-progress': { bg: 'rgba(255, 132, 27, 0.2)', text: '#FF841B' },
-      'completed': { bg: 'rgba(0, 255, 255, 0.2)', text: '#00FFFF' }
+      'open': { bg: 'rgba(0, 123, 255, 0.2)', text: '#007BFF' },
+      'pending': { bg: 'rgba(0, 123, 255, 0.2)', text: '#007BFF' },
+      'in-progress': { bg: 'rgba(138, 43, 226, 0.2)', text: '#8A2BE2' },
+      'completed': { bg: 'rgba(40, 167, 69, 0.2)', text: '#28A745' }
     };
 
     const priorityColors: Record<string, { bg: string; text: string }> = {
-      'high': { bg: 'rgba(255, 132, 27, 0.2)', text: '#FF841B' },
-      'medium': { bg: 'rgba(255, 215, 0, 0.2)', text: '#FFD700' },
-      'low': { bg: 'rgba(0, 255, 0, 0.2)', text: '#00FF00' }
+      'high': { bg: 'rgba(255, 0, 7, 0.2)', text: '#FF0007' },
+      'medium': { bg: 'rgba(255, 132, 27, 0.2)', text: '#FF841B' },
+      'low': { bg: 'rgba(255, 215, 0, 0.2)', text: '#FFD700' }
     };
 
     const colorMap = type === 'status' ? statusColors : priorityColors;

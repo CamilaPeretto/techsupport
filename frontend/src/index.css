@@ -97,11 +97,33 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--branco);
 }
 
+.form-control:hover {
+  box-shadow: 0 0 0 0.2rem rgba(230, 39, 248, 0.15);
+}
+
 .form-control:focus {
   background-color: var(--cinza-azulado);
   border-color: var(--magenta);
   color: var(--branco);
   box-shadow: 0 0 0 0.2rem rgba(230, 39, 248, 0.25);
+}
+
+/* Combobox (Form.Select) com o mesmo estilo dos inputs */
+.form-select {
+  background-color: var(--cinza-azulado) !important;
+  border-color: var(--cinza-escuro) !important;
+  color: var(--branco) !important;
+}
+
+.form-select:hover {
+  box-shadow: 0 0 0 0.2rem rgba(230, 39, 248, 0.15);
+}
+
+.form-select:focus {
+  background-color: var(--cinza-azulado) !important;
+  border-color: var(--magenta) !important;
+  color: var(--branco) !important;
+  box-shadow: 0 0 0 0.2rem rgba(230, 39, 248, 0.25) !important;
 }
 
 .form-control::placeholder {
@@ -150,18 +172,53 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 0 0 0.2rem rgba(230, 39, 248, 0.5);
 }
 
+/* Botão primário desabilitado continua magenta */
+.btn-primary:disabled,
+.btn-primary.disabled {
+  background-color: var(--magenta) !important;
+  border-color: var(--magenta) !important;
+  opacity: 0.65; /* mantém aparência de disabled sem perder a cor de marca */
+}
+
+/* Botão secundário padronizado (ex: Cancelar, Limpar) */
+.btn-secondary {
+  background-color: var(--cinza-azulado);
+  border: none;
+  color: var(--branco);
+  font-family: var(--font-secundaria);
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-secondary:hover {
+  background-color: var(--cinza-escuro);
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(230, 39, 248, 0.3);
+}
+
+.btn-secondary:focus {
+  box-shadow: 0 0 0 0.2rem rgba(230, 39, 248, 0.25);
+}
+
 /* Modais */
 .modal-content {
-  background-color: var(--cinza-azulado);
-  border-color: var(--cinza-escuro);
+  background-color: var(--cinza-azulado) !important;
+  border-color: var(--cinza-escuro) !important;
+  color: var(--branco) !important;
 }
 
 .modal-header {
-  border-bottom-color: var(--cinza-escuro);
+  background-color: var(--cinza-azulado) !important;
+  border-bottom-color: var(--cinza-escuro) !important;
+}
+
+.modal-header .modal-title {
+  color: var(--branco) !important;
+  font-family: var(--font-principal);
 }
 
 .modal-footer {
-  border-top-color: var(--cinza-escuro);
+  border-top-color: var(--cinza-escuro) !important;
 }
 
 /* Toast */
@@ -198,30 +255,83 @@ h1, h2, h3, h4, h5, h6 {
 /* Placeholder styling - garantir que não fique preto */
 input::placeholder,
 textarea::placeholder {
-  color: #6272A4 !important;
-  opacity: 0.7;
+  color: var(--branco) !important;
+  opacity: 0.8;
 }
 
 input::-webkit-input-placeholder,
 textarea::-webkit-input-placeholder {
-  color: #6272A4 !important;
-  opacity: 0.7;
+  color: var(--branco) !important;
+  opacity: 0.8;
 }
 
 input:-moz-placeholder,
 textarea:-moz-placeholder {
-  color: #6272A4 !important;
-  opacity: 0.7;
+  color: var(--branco) !important;
+  opacity: 0.8;
 }
 
 input::-moz-placeholder,
 textarea::-moz-placeholder {
-  color: #6272A4 !important;
-  opacity: 0.7;
+  color: var(--branco) !important;
+  opacity: 0.8;
 }
 
 input:-ms-input-placeholder,
 textarea:-ms-input-placeholder {
-  color: #6272A4 !important;
-  opacity: 0.7;
+  color: var(--branco) !important;
+  opacity: 0.8;
+}
+
+/* Linha do Tempo (Timeline) */
+.timeline {
+  position: relative;
+  padding-left: 2rem;
+  margin-top: 1rem;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 0.5rem;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--magenta);
+}
+
+.timeline-item {
+  position: relative;
+  padding-bottom: 1.5rem;
+}
+
+.timeline-item:last-child {
+  padding-bottom: 0;
+}
+
+.timeline-marker {
+  position: absolute;
+  left: -1.65rem;
+  top: 0.3rem;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--magenta);
+  border: 2px solid var(--cinza-azulado);
+  box-shadow: 0 0 8px rgba(230, 39, 248, 0.6);
+}
+
+.timeline-content {
+  padding-left: 0.5rem;
+}
+
+.timeline-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 0.25rem;
+}
+
+.timeline-date {
+  font-size: 0.85rem;
+  opacity: 0.8;
 }
