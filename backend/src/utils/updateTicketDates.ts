@@ -14,11 +14,7 @@ export async function updateTicketDates() {
     let updated = 0;
 
     for (const ticket of tickets) {
-      console.log(`\n🎫 Processando Ticket #${ticket.ticketNumber}:`);
-      console.log(`  Status: ${ticket.status}`);
-      console.log(`  AssignedTo: ${ticket.assignedTo ? 'Sim' : 'Não'}`);
-      console.log(`  Datas atuais: assignedAt=${ticket.assignedAt}, inProgressAt=${ticket.inProgressAt}, resolvedAt=${ticket.resolvedAt}`);
-      console.log(`  StatusHistory: ${ticket.statusHistory?.length || 0} entradas`);
+      // processamento silencioso por ticket
       
       const updates: any = {};
       let needsUpdate = false;
@@ -32,12 +28,10 @@ export async function updateTicketDates() {
         if (assignedHistory) {
           updates.assignedAt = assignedHistory.changedAt;
           needsUpdate = true;
-          console.log(`  ✓ Ticket #${ticket.ticketNumber}: assignedAt = ${assignedHistory.changedAt}`);
         } else {
           // Se não tem histórico, usar a data de criação ou updatedAt
           updates.assignedAt = ticket.updatedAt || ticket.createdAt;
           needsUpdate = true;
-          console.log(`  ✓ Ticket #${ticket.ticketNumber}: assignedAt = ${updates.assignedAt} (fallback)`);
         }
       }
 
@@ -50,12 +44,10 @@ export async function updateTicketDates() {
         if (inProgressHistory) {
           updates.inProgressAt = inProgressHistory.changedAt;
           needsUpdate = true;
-          console.log(`  ✓ Ticket #${ticket.ticketNumber}: inProgressAt = ${inProgressHistory.changedAt}`);
         } else if (ticket.assignedAt) {
           // Se não tem histórico, usar assignedAt
           updates.inProgressAt = ticket.assignedAt;
           needsUpdate = true;
-          console.log(`  ✓ Ticket #${ticket.ticketNumber}: inProgressAt = ${ticket.assignedAt} (fallback)`);
         }
       }
 
@@ -68,12 +60,10 @@ export async function updateTicketDates() {
         if (resolvedHistory) {
           updates.resolvedAt = resolvedHistory.changedAt;
           needsUpdate = true;
-          console.log(`  ✓ Ticket #${ticket.ticketNumber}: resolvedAt = ${resolvedHistory.changedAt}`);
         } else {
           // Se não tem histórico, usar updatedAt
           updates.resolvedAt = ticket.updatedAt;
           needsUpdate = true;
-          console.log(`  ✓ Ticket #${ticket.ticketNumber}: resolvedAt = ${ticket.updatedAt} (fallback)`);
         }
       }
 

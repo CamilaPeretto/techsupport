@@ -41,9 +41,8 @@ export default function Schedule() {
         setError(null);
         const assignedId = (user as unknown as { id?: string } | null)?.id;
         const url = assignedId ? `/api/tickets?assignedTo=${assignedId}` : `/api/tickets`;
-        const { data } = await api.get<TicketDTO[]>(url);
-        console.log('✅ Tickets carregados:', data);
-        setTickets(data);
+  const { data } = await api.get<TicketDTO[]>(url);
+  setTickets(data);
       } catch (e) {
         const err = e as { response?: { data?: { message?: string } } };
         console.error('❌ Erro ao carregar tickets:', err);
@@ -65,20 +64,14 @@ export default function Schedule() {
     // Validar se tickets é um array
     if (!Array.isArray(tickets)) return activities;
 
-    console.log('Buscando atividades para:', dayStart.toLocaleDateString('pt-BR'));
-    console.log('Total de tickets:', tickets.length);
+  // cálculo de atividades do dia selecionado
 
     tickets.forEach(ticket => {
-      console.log('Ticket:', ticket.ticketNumber, {
-        assignedAt: ticket.assignedAt,
-        inProgressAt: ticket.inProgressAt,
-        resolvedAt: ticket.resolvedAt
-      });
+      // processa datas relevantes do ticket
 
       // Verificar assignedAt
       if (ticket.assignedAt) {
-        const assignedDate = new Date(ticket.assignedAt);
-        console.log('assignedDate:', assignedDate, 'range:', dayStart, '-', dayEnd);
+  const assignedDate = new Date(ticket.assignedAt);
         if (assignedDate >= dayStart && assignedDate < dayEnd) {
           activities.push({
             ticket,
@@ -211,7 +204,6 @@ export default function Schedule() {
                 key={`${weekIdx}-${dayIdx}`}
                 onClick={() => {
                   if (date) {
-                    console.log('📅 Dia clicado:', date.toLocaleDateString('pt-BR'));
                     setSelectedDate(date);
                   }
                 }}
@@ -276,10 +268,10 @@ export default function Schedule() {
           {/* Card com atividades do dia selecionado */}
           {selectedDate && (
             <div style={{
-              backgroundColor: user?.role === 'tech' ? 'var(--preto)' : 'var(--color-secondary-bluish-gray)',
-              border: user?.role === 'tech' ? '1px solid var(--magenta)' : '1px solid var(--color-secondary-dark-gray)',
+              backgroundColor: 'var(--preto)',
+              border: '1px solid var(--magenta)',
               borderRadius: '8px',
-              boxShadow: user?.role === 'tech' ? '0 0 12px rgba(230, 39, 248, 0.4)' : 'var(--shadow-base)',
+              boxShadow: '0 0 12px rgba(230, 39, 248, 0.4)',
               padding: '1.5rem'
             }}>
               <h5 className="text-white mb-3">
@@ -296,53 +288,88 @@ export default function Schedule() {
                 </div>
               ) : (
                 <div className="table-responsive">
-                  <table className="table table-dark table-striped align-middle">
-                    <thead>
+                  <table 
+                    className="table table-dark align-middle mb-0"
+                    style={{
+                      backgroundColor: 'var(--preto)',
+                      border: '1px solid var(--magenta)',
+                      borderRadius: '8px',
+                      overflow: 'hidden'
+                    }}
+                  >
+                    <thead style={{ borderBottom: '2px solid var(--magenta)' }}>
                       <tr>
-                        <th>Horário</th>
-                        <th>Ticket</th>
-                        <th>Título</th>
-                        <th>Ação</th>
-                        <th>Status</th>
-                        <th>Prioridade</th>
+                        <th style={{ color: 'var(--magenta)', fontWeight: 'bold' }}>Horário</th>
+                        <th style={{ color: 'var(--magenta)', fontWeight: 'bold' }}>Ticket</th>
+                        <th style={{ color: 'var(--magenta)', fontWeight: 'bold' }}>Título</th>
+                        <th style={{ color: 'var(--magenta)', fontWeight: 'bold' }}>Status</th>
+                        <th style={{ color: 'var(--magenta)', fontWeight: 'bold' }}>Prioridade</th>
                       </tr>
                     </thead>
                     <tbody>
                       {selectedActivities.map((activity, idx) => (
-                        <tr key={`${activity.ticket._id}-${idx}`}>
-                          <td style={{ fontWeight: 'bold', color: 'var(--magenta)' }}>
-                            {activity.time}
-                          </td>
+                        <tr 
+                          key={`${activity.ticket._id}-${idx}`}
+                          style={{
+                            borderBottom: idx < selectedActivities.length - 1 ? '1px solid rgba(230, 39, 248, 0.2)' : 'none'
+                          }}
+                        >
                           <td>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                              <span style={{ fontWeight: 'bold', color: 'var(--magenta)', fontSize: '1rem' }}>
+                                {activity.time}
+                              </span>
+                              <span style={{
+                                padding: '0.125rem 0.5rem',
+                                borderRadius: '4px',
+                                backgroundColor: 'rgba(230, 39, 248, 0.2)',
+                                color: 'var(--magenta)',
+                                fontSize: '0.75rem',
+                                fontWeight: 'bold',
+                                width: 'fit-content'
+                              }}>
+                                {activity.action}
+                              </span>
+                            </div>
+                          </td>
+                          <td style={{ color: 'white', fontWeight: '500' }}>
                             #{activity.ticket.ticketNumber || activity.ticket._id.slice(-6)}
                           </td>
-                          <td>{activity.ticket.title}</td>
+                          <td style={{ color: 'white' }}>{activity.ticket.title}</td>
                           <td>
                             <span style={{
                               padding: '0.25rem 0.75rem',
                               borderRadius: '4px',
-                              backgroundColor: 'rgba(230, 39, 248, 0.2)',
-                              color: 'var(--magenta)',
+                              backgroundColor: 
+                                activity.ticket.status === 'concluído' ? 'var(--status-success-bg)' :
+                                activity.ticket.status === 'em andamento' ? 'var(--status-warning-bg)' :
+                                'var(--status-muted-bg)',
+                              color: 
+                                activity.ticket.status === 'concluído' ? 'var(--status-success)' :
+                                activity.ticket.status === 'em andamento' ? 'var(--status-warning)' :
+                                'var(--status-muted)',
                               fontSize: '0.875rem',
-                              fontWeight: 'bold'
+                              fontWeight: '500',
+                              textTransform: 'capitalize'
                             }}>
-                              {activity.action}
+                              {activity.ticket.status}
                             </span>
                           </td>
-                          <td className="text-capitalize">{activity.ticket.status}</td>
-                          <td className="text-capitalize">
+                          <td>
                             <span style={{
                               padding: '0.25rem 0.5rem',
                               borderRadius: '4px',
                               backgroundColor: 
-                                activity.ticket.priority === 'alta' ? 'rgba(220, 53, 69, 0.2)' :
-                                activity.ticket.priority === 'média' ? 'rgba(255, 193, 7, 0.2)' :
-                                'rgba(25, 135, 84, 0.2)',
+                                activity.ticket.priority === 'alta' ? 'var(--priority-high-bg)' :
+                                activity.ticket.priority === 'média' ? 'var(--priority-medium-bg)' :
+                                'var(--priority-low-bg)',
                               color: 
-                                activity.ticket.priority === 'alta' ? '#dc3545' :
-                                activity.ticket.priority === 'média' ? '#ffc107' :
-                                '#198754',
-                              fontSize: '0.875rem'
+                                activity.ticket.priority === 'alta' ? 'var(--priority-high)' :
+                                activity.ticket.priority === 'média' ? 'var(--priority-medium)' :
+                                'var(--priority-low)',
+                              fontSize: '0.875rem',
+                              fontWeight: '500',
+                              textTransform: 'capitalize'
                             }}>
                               {activity.ticket.priority || 'média'}
                             </span>
