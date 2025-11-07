@@ -1,3 +1,7 @@
+// Componente de tabela simples e reutilizável
+// Comentários em português: este arquivo expõe componentes leves que
+// encapsulam a marcação <table> e adicionam pequenas conveniências (sticky header,
+// comportamento hover em linhas, células com estilo padrão).
 import React from 'react';
 
 interface TableProps {
@@ -28,6 +32,7 @@ interface TableCellProps {
   header?: boolean;
 }
 
+// Container responsivo que envolve a tabela para permitir rolagem horizontal/vertical
 const Table: React.FC<TableProps> = ({ children, className = '', ...props }) => {
   return (
     <div style={{ 
@@ -46,6 +51,7 @@ const Table: React.FC<TableProps> = ({ children, className = '', ...props }) => 
   );
 };
 
+// Cabeçalho com comportamento sticky (permanece visível ao rolar)
 const TableHeader: React.FC<TableHeaderProps> = ({ children, className = '', ...props }) => {
   return (
     <thead className={className} style={{
@@ -60,6 +66,7 @@ const TableHeader: React.FC<TableHeaderProps> = ({ children, className = '', ...
   );
 };
 
+// Corpo da tabela (simples wrapper para manter API consistente)
 const TableBody: React.FC<TableBodyProps> = ({ children, className = '', ...props }) => {
   return (
     <tbody className={className} style={{
@@ -71,6 +78,7 @@ const TableBody: React.FC<TableBodyProps> = ({ children, className = '', ...prop
   );
 };
 
+// Linha da tabela com comportamento de hover opcional e clique
 const TableRow: React.FC<TableRowProps> = ({ 
   children, 
   className = '', 
@@ -89,6 +97,7 @@ const TableRow: React.FC<TableRowProps> = ({
       }}
       onClick={onClick}
       onMouseEnter={(e) => {
+        // Aplica cor de fundo quando hover está habilitado
         if (hover) {
           (e.currentTarget as HTMLTableRowElement).style.backgroundColor = 'var(--color-secondary-dark-gray)';
         }
@@ -105,6 +114,8 @@ const TableRow: React.FC<TableRowProps> = ({
   );
 };
 
+// Célula da tabela que pode ser th ou td conforme `header`.
+// Define estilos base (padding, tipografia, borda inferior, uppercase para header).
 const TableCell: React.FC<TableCellProps> = ({ 
   children, 
   className = '', 
@@ -119,7 +130,7 @@ const TableCell: React.FC<TableCellProps> = ({
     fontWeight: header ? 700 : 400,
     color: 'var(--color-primary-white)',
     fontFamily: header ? 'var(--font-family-primary)' : 'var(--font-family-secondary)',
-    borderBottom: header ? 'none' : '1px solid #4A4A6A',
+      borderBottom: header ? 'none' : '1px solid var(--color-secondary-bluish-gray)',
     textTransform: header ? 'uppercase' : 'none',
     letterSpacing: header ? '0.05em' : 'normal'
   };

@@ -1,8 +1,9 @@
 import Ticket from '../models/Ticket';
 
 /**
- * Script para atualizar os campos de data dos tickets existentes
- * baseado no statusHistory
+ * Atualiza campos de datas (assignedAt, inProgressAt, resolvedAt) dos tickets
+ * baseado no conteúdo de statusHistory quando esses campos estão ausentes.
+ * Esse util é usado pelo script src/scripts/updateDates.ts.
  */
 export async function updateTicketDates() {
   try {
@@ -14,70 +15,55 @@ export async function updateTicketDates() {
     let updated = 0;
 
     for (const ticket of tickets) {
-      console.log(`\n🎫 Processando Ticket #${ticket.ticketNumber}:`);
-      console.log(`  Status: ${ticket.status}`);
-      console.log(`  AssignedTo: ${ticket.assignedTo ? 'Sim' : 'Não'}`);
-      console.log(`  Datas atuais: assignedAt=${ticket.assignedAt}, inProgressAt=${ticket.inProgressAt}, resolvedAt=${ticket.resolvedAt}`);
-      console.log(`  StatusHistory: ${ticket.statusHistory?.length || 0} entradas`);
-      
+      // Colete atualizações necessárias para o ticket atual
       const updates: any = {};
       let needsUpdate = false;
 
-      // Se não tem assignedAt mas tem assignedTo, pegar do statusHistory
+      // 1) assignedAt ausente mas existe assignedTo -> tentar inferir a data
       if (!ticket.assignedAt && ticket.assignedTo) {
-        // Procurar no statusHistory quando foi atribuído
         const assignedHistory = ticket.statusHistory?.find(
           h => h.status === 'atribuído' || (h.assignedTechnicianName && h.assignedTechnicianName.length > 0)
         );
         if (assignedHistory) {
           updates.assignedAt = assignedHistory.changedAt;
           needsUpdate = true;
-          console.log(`  ✓ Ticket #${ticket.ticketNumber}: assignedAt = ${assignedHistory.changedAt}`);
         } else {
-          // Se não tem histórico, usar a data de criação ou updatedAt
+          // fallback: usar updatedAt ou createdAt
           updates.assignedAt = ticket.updatedAt || ticket.createdAt;
           needsUpdate = true;
-          console.log(`  ✓ Ticket #${ticket.ticketNumber}: assignedAt = ${updates.assignedAt} (fallback)`);
         }
       }
 
-      // Se não tem inProgressAt mas está em andamento ou concluído
+      // 2) inProgressAt ausente mas status indica em andamento/concluído
       if (!ticket.inProgressAt && (ticket.status === 'em andamento' || ticket.status === 'concluído')) {
-        // Procurar no statusHistory quando mudou para "em andamento"
         const inProgressHistory = ticket.statusHistory?.find(
           h => h.status === 'em andamento'
         );
         if (inProgressHistory) {
           updates.inProgressAt = inProgressHistory.changedAt;
           needsUpdate = true;
-          console.log(`  ✓ Ticket #${ticket.ticketNumber}: inProgressAt = ${inProgressHistory.changedAt}`);
         } else if (ticket.assignedAt) {
-          // Se não tem histórico, usar assignedAt
+          // fallback: usar assignedAt quando não há histórico
           updates.inProgressAt = ticket.assignedAt;
           needsUpdate = true;
-          console.log(`  ✓ Ticket #${ticket.ticketNumber}: inProgressAt = ${ticket.assignedAt} (fallback)`);
         }
       }
 
-      // Se não tem resolvedAt mas está concluído
+      // 3) resolvedAt ausente mas status é concluído -> inferir data de resolução
       if (!ticket.resolvedAt && ticket.status === 'concluído') {
-        // Procurar no statusHistory quando mudou para "concluído"
         const resolvedHistory = ticket.statusHistory?.find(
           h => h.status === 'concluído'
         );
         if (resolvedHistory) {
           updates.resolvedAt = resolvedHistory.changedAt;
           needsUpdate = true;
-          console.log(`  ✓ Ticket #${ticket.ticketNumber}: resolvedAt = ${resolvedHistory.changedAt}`);
         } else {
-          // Se não tem histórico, usar updatedAt
           updates.resolvedAt = ticket.updatedAt;
           needsUpdate = true;
-          console.log(`  ✓ Ticket #${ticket.ticketNumber}: resolvedAt = ${ticket.updatedAt} (fallback)`);
         }
       }
 
-      // Atualizar se necessário
+      // Persistir alterações quando necessário
       if (needsUpdate) {
         await Ticket.findByIdAndUpdate(ticket._id, updates);
         updated++;

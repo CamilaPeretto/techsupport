@@ -1,74 +1,58 @@
-// Importa o Express, framework para criar o servidor e gerenciar rotas
+// Importação do framework Express e tipos úteis
 import express, { Express, Request, Response } from "express";
-// Importa o CORS para permitir que o frontend acesse a API
+// Cors para controle de origem, Helmet para cabeçalhos de segurança
 import cors from "cors";
-// Importa o Helmet para adicionar cabeçalhos de segurança HTTP
 import helmet from "helmet";
-// Importa o express-rate-limit, que limita o número de requisições (protege contra ataques DoS)
+// Rate limiter para proteger contra abuso de requests
 import rateLimit from "express-rate-limit";
-// Importa o cookie-parser para ler cookies enviados pelo cliente
+// Cookie parser para ler cookies, morgan para logging de requisições
 import cookieParser from "cookie-parser";
-// Importa o morgan, middleware para logar requisições no terminal
 import morgan from "morgan";
-// Carrega variáveis de ambiente
+// dotenv para carregar variáveis de ambiente do .env
 import dotenv from "dotenv";
-// Importa as rotas
+// Importa os roteadores da aplicação
 import userRoutes from "./routes/userRoutes";
 import ticketRoutes from "./routes/ticketRoutes";
+// Middleware de autenticação (verifica JWT no header)
 import auth from "./middleware/auth";
 
+// Carrega variáveis de ambiente (ex: PORT, JWT_SECRET, credenciais DB)
 dotenv.config();
 
-// Cria a instância principal do app Express
+// Inicializa a aplicação Express e tipa a variável como Express
 const app: Express = express();
 
-// ---------- MIDDLEWARES DE SEGURANÇA E CONFIGURAÇÃO ----------
-
-// Adiciona o Helmet para proteger contra vulnerabilidades básicas
-app.use(helmet());
-
-// Libera o acesso da API para qualquer origem (idealmente, em produção, deve ser restrito)
+// Middlewares globais
+app.use(helmet()); // adiciona cabeçalhos de segurança
+// Configura CORS. Atualmente permite qualquer origem — revisar para produção.
 app.use(cors({ origin: "*", credentials: true }));
-
-// Habilita o parsing de JSON no corpo das requisições (req.body)
+// Permite parsing de JSON no corpo das requisições
 app.use(express.json());
-
-// Habilita o uso de cookies nas requisições
+// Parse de cookies caso seja necessário ler cookies HTTP
 app.use(cookieParser());
-
-// Loga requisições HTTP no terminal no formato "dev" (ex: GET /api 200 32ms)
+// Logger de requisições (dev -> formatação compacta)
 app.use(morgan("dev"));
 
-// Log detalhado de todas as requisições
-app.use((req, _res, next) => {
-  console.log(`\n🔵 ${req.method} ${req.url}`);
-  console.log('📦 Body:', JSON.stringify(req.body, null, 2));
-  next();
-});
-
-// ---------- RATE LIMITING ----------
-// Configura um limite de 100 requisições por IP a cada 15 minutos
+// Limiter de requisições para evitar abuso (100 requests por 15 minutos)
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // tempo do intervalo (15 minutos)
-  max: 100, // número máximo de requisições
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 100, // limite de 100 requisições por IP
   message: "Muitas requisições — tente novamente mais tarde.",
 });
 
-// Aplica o limitador a todas as rotas da API
+// Aplica o rate limiter globalmente
 app.use(limiter);
 
-// ---------- ROTAS ----------
+// Rotas públicas/sem middleware: autenticação e registro/login estão em userRoutes
 app.use("/api", userRoutes);
-// Protege as rotas de tickets
+// Rotas de tickets protegidas por middleware de auth (checa JWT)
+// Observação: auth valida o token presente em Authorization: Bearer <token>
 app.use("/api/tickets", auth, ticketRoutes);
-app.use("/api/ticket", auth, ticketRoutes); // Alias para compatibilidade
-app.use("/api/tecnico/tickets", auth, ticketRoutes); // Rota para técnicos
 
-// ---------- ROTAS BÁSICAS ----------
-// Rota inicial apenas para teste, retorna mensagem de status
+// Rota raiz apenas para healthcheck / verificação rápida
 app.get("/", (_req: Request, res: Response) => {
   res.status(200).json({ message: "API TechSupport online! 🚀" });
 });
 
-// Exporta o app para ser usado em server.js
+// Exporta a instância do app para ser usada pelo servidor (server.ts)
 export default app;

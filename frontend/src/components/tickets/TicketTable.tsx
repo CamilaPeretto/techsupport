@@ -1,3 +1,5 @@
+// Componente de tabela que exibe uma lista de chamados
+// Comentários em português: estrutura, estilos condicionais e composição
 import React from 'react';
 import { Table, TableHeader, TableBody, TableRow, TableCell } from '../ui/Table';
 import TicketRow from './TicketRow';
@@ -24,11 +26,13 @@ const TicketTable: React.FC<TicketTableProps> = ({
   onTicketClick,
   className = '',
 }) => {
+  // Determina se o usuário é técnico para ajustar estilos visuais
   const user = useAppSelector(s => s.auth.user);
   const isTech = user?.role === 'tech';
 
   return (
     <div className={className} style={{
+      // Estilo condicional para destacar técnicos (tema escuro + borda)
       backgroundColor: isTech ? "var(--preto)" : "var(--color-secondary-bluish-gray)",
       borderRadius: "8px",
       boxShadow: isTech ? "0 0 12px rgba(230, 39, 248, 0.4)" : "var(--shadow-base)",
@@ -41,6 +45,7 @@ const TicketTable: React.FC<TicketTableProps> = ({
           <Table>
             <TableHeader>
               <TableRow>
+                {/* Cabeçalho da tabela - colunas: ID, título, status, prioridade, data, técnico */}
                 <TableCell header>ID</TableCell>
                 <TableCell header>TÍTULO</TableCell>
                 <TableCell header>STATUS</TableCell>

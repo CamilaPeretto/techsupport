@@ -4,22 +4,28 @@ import auth from "../middleware/auth";
 
 const router = Router();
 
-// Rota para registrar usuário
+// POST /api/register
+// Cria um novo usuário (registro). Validações aplicadas no controller.
 router.post("/register", registerUser);
 
-// Rota para login
+// POST /api/login
+// Endpoint de login que retorna token JWT e dados do usuário
 router.post("/login", loginUser);
 
-// Rota para obter dados do usuário autenticado
+// GET /api/me
+// Retorna dados do usuário autenticado — exige middleware de auth
 router.get("/me", auth, getCurrentUser);
 
-// Rota para listar usuários
+// GET /api/users
+// Lista usuários (requer autenticação) — proteger/filtrar conforme papéis conforme necessário
 router.get("/users", auth, getAllUsers);
 
-// Obter usuário por id
+// GET /api/users/:id
+// Recupera um usuário por id (requer autenticação)
 router.get("/users/:id", auth, getUserById);
 
-// Atualizar perfil (simples, sem auth neste MVP)
+// PUT /api/users/:id
+// Atualiza perfil de usuário (requer autenticação) — atualmente protegido por auth
 router.put("/users/:id", auth, updateUser);
 
 export default router;

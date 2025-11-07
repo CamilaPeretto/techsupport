@@ -1,3 +1,5 @@
+// Versão simples do modal de atualização de status usada em listas/ações rápidas
+// Comentários em português para documentar estados e fluxo
 import React, { useState } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import api from '../../services/api';
@@ -10,10 +12,12 @@ type Props = {
 };
 
 const StatusUpdateModalSimple: React.FC<Props> = ({ ticketId, currentStatus, onClose, onUpdated }) => {
+  // Estado local: status atual selecionado e campo de resolução (quando necessário)
   const [status, setStatus] = useState<'aberto' | 'em andamento' | 'concluído'>(currentStatus);
   const [resolution, setResolution] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
+  // Envia a atualização para a API. payload inclui resolução somente se aplicável.
   const handleSubmit = async () => {
     try {
       setSubmitting(true);
@@ -22,10 +26,12 @@ const StatusUpdateModalSimple: React.FC<Props> = ({ ticketId, currentStatus, onC
         payload.resolution = resolution.trim();
       }
       await api.put(`/api/tickets/${ticketId}/status`, payload);
+      // Notifica o componente pai que houve atualização e fecha o modal
       onUpdated();
       onClose();
     } catch (err) {
       console.error('Erro ao atualizar status:', err);
+      // Feedback simples: alerta (pode ser substituído por Toast global)
       alert('Erro ao atualizar o status do chamado.');
     } finally {
       setSubmitting(false);
@@ -47,6 +53,7 @@ const StatusUpdateModalSimple: React.FC<Props> = ({ ticketId, currentStatus, onC
           </Form.Select>
         </Form.Group>
 
+        {/* Quando o status for concluído, exibimos o campo de resolução */}
         {status === 'concluído' && (
           <Form.Group className="mb-3">
             <Form.Label className="text-white">Resolução</Form.Label>

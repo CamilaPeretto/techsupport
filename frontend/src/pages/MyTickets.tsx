@@ -8,23 +8,30 @@ import { fetchTickets, type Ticket as DomainTicket } from '../store/ticketsSlice
 import NewTicketModal from '../components/tickets/NewTicketModal';
 import TicketDetailModal from '../components/tickets/TicketDetailModal';
 
+// Página 'Meus Chamados' — lista e filtros dos chamados do usuário logado
 const MyTickets: React.FC = () => {
+  // dispatch tipado do Redux
   const dispatch = useAppDispatch();
+  // items e loading do slice de tickets
   const { items, loading } = useAppSelector(s => s.tickets);
+  // usuário autenticado do slice auth
   const user = useAppSelector(s => s.auth.user);
+  // filtros locais (status, prioridade, intervalo de datas)
   const [filters, setFilters] = useState<{ status?: DomainTicket['status']; priority?: DomainTicket['priority']; fromDate?: string; toDate?: string }>({});
+  // controles de modais/local state
   const [showNewTicket, setShowNewTicket] = useState(false);
   const [showDetailTicket, setShowDetailTicket] = useState(false);
   const [detailTicketId, setDetailTicketId] = useState<string | null>(null);
 
-  // Carrega os tickets na montagem do componente
+  // Carrega os tickets do usuário quando o componente monta ou user.id muda
   useEffect(() => {
     if (user?.id) {
+      // chama o thunk que busca tickets filtrados por userId
       dispatch(fetchTickets({ userId: user.id }));
     }
   }, [dispatch, user?.id]);
 
-  // Listener para o botão do Header
+  // Listener global: quando o Header dispara 'openNewTicketModal', abre o modal
   useEffect(() => {
     const handleOpenModal = () => {
       if (!user?.id) { alert('Faça login para criar tickets.'); return; }
@@ -34,6 +41,7 @@ const MyTickets: React.FC = () => {
     return () => window.removeEventListener('openNewTicketModal', handleOpenModal);
   }, [user?.id]);
 
+  // Tipo local usado pela tabela (mapeamento do domínio para exibição)
   type TableTicket = {
     id: string;
     ticketNumber?: number;
@@ -45,6 +53,7 @@ const MyTickets: React.FC = () => {
     assignedTechnician?: string;
   };
 
+  // Converte tickets do domínio (pt-BR) para o formato usado na tabela (en)
   const tableTickets: TableTicket[] = useMemo(() => {
     const mapStatus = (s: DomainTicket['status']): TableTicket['status'] => {
       switch (s) {
@@ -70,9 +79,10 @@ const MyTickets: React.FC = () => {
           return 'medium';
       }
     };
+    // Mapeia cada item do estado para a representação da tabela
     return items.map((t) => ({
       id: t._id,
-  ticketNumber: t.ticketNumber,
+      ticketNumber: t.ticketNumber,
       title: t.title,
       status: mapStatus(t.status),
       priority: mapPriority(t.priority),
@@ -82,18 +92,20 @@ const MyTickets: React.FC = () => {
     }));
   }, [items]);
 
+  // Ao clicar numa linha, abre o modal de detalhe
   const handleTicketClick = (t: TableTicket) => {
     setDetailTicketId(t.id);
     setShowDetailTicket(true);
   };
 
+  // Estatísticas rápidas calculadas a partir dos items
   const stats = useMemo(() => {
-    const mine = items.filter(t => t.userId === user?.id);
-    const total = mine.length;
-    const inProgress = mine.filter(t => t.status === 'em andamento').length;
-    const completed = mine.filter(t => t.status === 'concluído').length;
+    // Items já vem filtrados do backend para o usuário logado
+    const total = items.length;
+    const inProgress = items.filter(t => t.status === 'em andamento').length;
+    const completed = items.filter(t => t.status === 'concluído').length;
     return { total, inProgress, completed };
-  }, [items, user?.id]);
+  }, [items]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '1.75rem', paddingBottom: '2rem' }}>
@@ -103,6 +115,7 @@ const MyTickets: React.FC = () => {
         gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
         gap: '1.5rem' 
       }}>
+        {/* Cards reutilizáveis mostrando números importantes */}
         <StatsCard title="Total de Tickets" value={stats.total} icon={<Ticket size={24} />} />
         <StatsCard title="Em Andamento" value={stats.inProgress} icon={<Clock size={24} />} />
         <StatsCard title="Concluídos" value={stats.completed} icon={<CheckCircle size={24} />} />
@@ -118,6 +131,7 @@ const MyTickets: React.FC = () => {
       }}>
         <Form className="row g-3 justify-content-md-between" aria-label="Filtros dos meus tickets">
           <div className="col-12 col-md-2">
+            {/* Filtro de status */}
             <Form.Label className="text-white">Status</Form.Label>
             <Form.Select value={filters.status || ''} onChange={(e) => { const v = e.target.value as '' | 'aberto' | 'em andamento' | 'concluído'; setFilters(f => ({ ...f, status: v || undefined })); }} aria-label="Filtro de status">
               <option value="">Todos</option>
@@ -127,6 +141,7 @@ const MyTickets: React.FC = () => {
             </Form.Select>
           </div>
           <div className="col-12 col-md-2">
+            {/* Filtro de prioridade */}
             <Form.Label className="text-white">Prioridade</Form.Label>
             <Form.Select value={filters.priority || ''} onChange={(e) => { const v = e.target.value as '' | 'baixa' | 'média' | 'alta'; setFilters(f => ({ ...f, priority: v || undefined })); }} aria-label="Filtro de prioridade">
               <option value="">Todas</option>
@@ -136,14 +151,17 @@ const MyTickets: React.FC = () => {
             </Form.Select>
           </div>
           <div className="col-6 col-md-2">
+            {/* Data inicial */}
             <Form.Label className="text-white">De</Form.Label>
             <Form.Control type="date" value={filters.fromDate || ''} onChange={(e) => setFilters(f => ({ ...f, fromDate: e.target.value || undefined }))} aria-label="Data inicial" />
           </div>
           <div className="col-6 col-md-2">
+            {/* Data final */}
             <Form.Label className="text-white">Até</Form.Label>
             <Form.Control type="date" value={filters.toDate || ''} onChange={(e) => setFilters(f => ({ ...f, toDate: e.target.value || undefined }))} aria-label="Data final" />
           </div>
           <div className="col-12 col-md-3 d-flex align-items-end justify-content-end gap-2">
+            {/* Botão Filtrar — dispara thunk com os filtros selecionados */}
             <button 
               type="button"
               style={{
@@ -169,6 +187,7 @@ const MyTickets: React.FC = () => {
             >
               Filtrar
             </button>
+            {/* Botão Limpar — remove filtros e recarrega */}
             <button 
               type="button"
               style={{
@@ -218,6 +237,7 @@ const MyTickets: React.FC = () => {
         )}
       </div>
 
+      {/* Modais de criar novo ticket e visualizar detalhe */}
       <NewTicketModal show={showNewTicket} onClose={() => setShowNewTicket(false)} />
       <TicketDetailModal 
         show={showDetailTicket} 

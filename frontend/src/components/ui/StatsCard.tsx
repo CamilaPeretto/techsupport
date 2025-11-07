@@ -1,10 +1,15 @@
+// Card de estatísticas usado em dashboards
+// Comentários em português: componente visualmente adaptável conforme role do usuário
 import React from 'react';
 import { useAppSelector } from '../../hooks/useRedux';
 
 interface StatsCardProps {
+  // título descritivo (ex: 'Chamados Abertos')
   title: string;
+  // valor exibido (número ou string formatada)
   value: string | number;
   className?: string;
+  // opcional: ícone para complementar o card (SVG/elemento React)
   icon?: React.ReactNode;
 }
 
@@ -14,9 +19,12 @@ const StatsCard: React.FC<StatsCardProps> = ({
   className = '',
   icon 
 }) => {
+  // Usa o usuário logado para ajustar o estilo do card (tema para técnicos)
   const user = useAppSelector(s => s.auth.user);
   const isTech = user?.role === 'tech';
 
+  // O componente usa estilos inline para manter consistência visual rápida
+  // e permite sobrescrita via `className` quando necessário.
   return (
     <div className={className} style={{ 
       backgroundColor: isTech ? "var(--preto)" : "var(--color-secondary-bluish-gray)",
@@ -31,6 +39,7 @@ const StatsCard: React.FC<StatsCardProps> = ({
       minHeight: "140px"
     }}>
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+        {/* Se houver ícone, exibe acima do valor */}
         {icon && (
           <div style={{ 
             marginBottom: "0.75rem", 
@@ -39,6 +48,8 @@ const StatsCard: React.FC<StatsCardProps> = ({
             {icon}
           </div>
         )}
+
+        {/* Valor principal (grande) */}
         <h3 style={{ 
           fontSize: "2rem", 
           fontWeight: "bold", 
@@ -48,6 +59,8 @@ const StatsCard: React.FC<StatsCardProps> = ({
         }}>
           {value}
         </h3>
+
+        {/* Texto auxiliar (título) */}
         <p style={{ 
           fontSize: "0.875rem", 
           color: "var(--color-secondary-grayish-blue)",
