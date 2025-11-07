@@ -1,41 +1,42 @@
-/* Importa fontes do Google Fonts */
+/* Importa fontes do Google Fonts (tipografia principal e secundária) */
 @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap');
 
-/* Reset e estilos base */
+/* Reset e estilos base: garante comportamento consistente entre navegadores */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* Cores Principais */
+/* Variáveis CSS globais — cores, tipografia, espaçamentos e aliases usados pelo design system */
 :root {
+  /* Cores primárias da identidade visual */
   --magenta: #E627F8;
   --vermelho: #FF0007;
   --laranja: #FF841B;
   --preto: #000000;
   --branco: #FFFFFF;
 
-  /* Cores Secundárias */
+  /* Cores secundárias para elementos de UI */
   --cinza-escuro: #212121;
   --cinza-azulado: #28282E;
   --azul-acinzentado: #6272A4;
   --ciano: #00FFFF;
   --rosa-claro: #FF66CC;
 
-  /* Tipografia */
+  /* Tipografia: família principal para monospaced, secundária para UI */
   --font-principal: 'Fira Code', monospace;
   --font-secundaria: 'Inter', sans-serif;
 
-  /* Espaçamento e bordas */
+  /* Medidas base */
   --border-radius: 8px;
   --padding-base: 12px;
   --margin-base: 16px;
 
-  /* Sombras */
+  /* Sombras padrão usadas em cartões e botões */
   --box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.4);
 
-  /* Aliases para componentes do colaborador */
+  /* Aliases e tokens reutilizáveis para componentes */
   --color-primary-magenta: var(--magenta);
   --color-primary-white: var(--branco);
   --color-primary-black: var(--preto);
@@ -48,6 +49,35 @@
   --border-radius-base: var(--border-radius);
   --font-weight-medium: 500;
   --shadow-base: var(--box-shadow);
+
+  /* Status semânticos */
+  --status-success: #198754;
+  --status-success-bg: rgba(25, 135, 84, 0.2);
+  --status-warning: #ffc107;
+  --status-warning-bg: rgba(255, 193, 7, 0.2);
+  --status-muted: #6c757d;
+  --status-muted-bg: rgba(108, 117, 125, 0.2);
+  --status-open: #007BFF;
+  --status-open-bg: rgba(0, 123, 255, 0.2);
+  --status-in-progress: #8A2BE2;
+  --status-in-progress-bg: rgba(138, 43, 226, 0.2);
+  --status-completed: #28A745;
+  --status-completed-bg: rgba(40, 167, 69, 0.2);
+
+  /* Prioridades */
+  --priority-high: #dc3545;
+  --priority-high-bg: rgba(220, 53, 69, 0.2);
+  --priority-medium: var(--status-warning);
+  --priority-medium-bg: var(--status-warning-bg);
+  --priority-low: var(--status-success);
+  --priority-low-bg: var(--status-success-bg);
+  --priority-high-alt: var(--vermelho); /* alternativa vermelha da paleta */
+  --priority-medium-alt: var(--laranja); /* alternativa laranja da paleta */
+  --priority-low-alt: #FFD700; /* dourado usado anteriormente */
+
+  /* Neutros informativos */
+  --neutral-info: var(--azul-acinzentado);
+  --neutral-info-bg: rgba(98, 114, 164, 0.2);
 }
 
 /* Layout principal */

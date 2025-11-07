@@ -1,13 +1,14 @@
-// Componente do formulário de login principal
+// Componente do formulário de login principal (comentado em português)
 import { useState, FormEvent } from 'react';
 import { Container, Form, Button, Toast, ToastContainer } from 'react-bootstrap';
-import { loginStart, loginSuccess, loginFailure, clearError } from '../../store/authSlice';
+import { clearError, loginFailure } from '../../store/authSlice';
+import { login } from '../../store/authThunks';
 import logo from '../../assets/logo.png';
 import CreateAccountModal from './CreateAccountModal';
 import ForgotPasswordModal from './ForgotPasswordModal';
 import LoginErrorModal from './LoginErrorModal';
 import { useAppDispatch, useAppSelector } from '../../hooks/useRedux';
-import api from '../../services/api';
+// Observação: a chamada HTTP direta foi movida para thunks; este componente usa dispatch(login(...))
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const LoginForm = () => {
@@ -15,7 +16,7 @@ const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   
-  // Estados para controlar os modais
+  // Estados para controlar os modais (criar conta, esqueceu senha, erro de login)
   const [showCreateAccount, setShowCreateAccount] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [showLoginError, setShowLoginError] = useState(false);
@@ -24,36 +25,47 @@ const LoginForm = () => {
   // Estado para controlar toast de sucesso
   const [showToast, setShowToast] = useState(false);
 
-  // Redux hooks
+  // Hooks do Redux / navegação
   const dispatch = useAppDispatch();
   const { loading } = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
   const location = useLocation();
 
   // Função que valida e processa o login
+  // Aceita um FormEvent do formulário principal ou do modal de erro (que injeta currentTarget)
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
 
-    dispatch(loginStart());
+    // Extrai email e senha - pode vir do form principal (estados locais) ou do modal (currentTarget)
+    let currentEmail = email;
+    let currentPassword = password;
+    
+    // Se o evento vier do modal de erro, ele coloca os inputs em currentTarget
+    const target = e.currentTarget as { email?: { value: string }; password?: { value: string } };
+    if (target?.email && target?.password) {
+      currentEmail = target.email.value;
+      currentPassword = target.password.value;
+      // Atualiza os estados locais com os valores vindos do modal
+      setEmail(currentEmail);
+      setPassword(currentPassword);
+    }
 
-    // Validação 1: Verifica se os campos estão preenchidos
-    if (!email || !password) {
+    // Validações locais antes de chamar o thunk
+    if (!currentEmail || !currentPassword) {
       setErrorMessage('Por favor, preencha todos os campos.');
       setShowLoginError(true);
       dispatch(loginFailure('Campos vazios'));
       return;
     }
 
-    // Validação 2: Verifica se o email é válido
-    if (!email.includes('@')) {
+    if (!currentEmail.includes('@')) {
       setErrorMessage('Email inválido. Por favor, insira um email válido.');
       setShowLoginError(true);
       dispatch(loginFailure('Email inválido'));
       return;
     }
 
-    // Validação 3: Verifica se a senha tem pelo menos 6 caracteres
-    if (password.length < 6) {
+    if (currentPassword.length < 6) {
       setErrorMessage('Senha incorreta. Por favor, tente novamente.');
       setShowLoginError(true);
       dispatch(loginFailure('Senha incorreta'));
@@ -61,44 +73,35 @@ const LoginForm = () => {
     }
 
     try {
-      const { data } = await api.post('/api/login', { email, password });
-      const { token, user } = data;
-      if (token) {
-        localStorage.setItem('token', token);
-      }
-      dispatch(loginSuccess({ 
-        id: user.id, 
-        email: user.email, 
-        name: user.name, 
-        role: user.role,
-        department: user.department,
-        position: user.position
-      }));
+      // Dispatch do thunk de login (ele faz a chamada API, armazena token e atualiza o estado global)
+      const result = await dispatch(login({ email: currentEmail, password: currentPassword })) as unknown;
+      const user = (result as { role?: string } | undefined) || undefined;
+      // Exibe um breve toast de sucesso antes de navegar
       setShowToast(true);
       const defaultPath = user?.role === 'tech' ? '/tickets' : '/my-tickets';
       const from = (location.state as { from?: { pathname?: string } } | null | undefined)?.from?.pathname || defaultPath;
-      // pequeno delay para o toast aparecer rapidamente
+      // Pequeno delay para o toast ficar visível antes da navegação
       setTimeout(() => navigate(from, { replace: true }), 300);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Falha no login';
       setErrorMessage(message);
       setShowLoginError(true);
-      dispatch(loginFailure(message));
+      // Nota: o thunk já dispara loginFailure quando necessário
     }
   };
 
   return (
     <>
-      {/* Container principal com fundo preto */}
+      {/* Container principal com fundo escuro */}
       <Container 
         fluid 
         className="min-vh-100 d-flex align-items-center justify-content-center"
         style={{
-          background: '#000000',
+          background: 'var(--preto)',
         }}
       >
         <div style={{ width: '100%', maxWidth: '400px' }}>
-          {/* Logo com efeito de brilho */}
+          {/* Logo com efeito visual */}
           <div className="text-center mb-4">
             <img 
               src={logo} 
@@ -118,36 +121,38 @@ const LoginForm = () => {
             />
           </div>
 
-          {/* Formulário de Login */}
+          {/* Formulário de Login (dispara handleLogin) */}
           <Form onSubmit={handleLogin}>
             {/* Campo de Email */}
             <Form.Group className="mb-3">
-              <Form.Label className="text-white">Email</Form.Label>
+              <Form.Label className="text-white" style={{ fontFamily: 'var(--font-secundaria)' }}>Email</Form.Label>
               <Form.Control
                 type="email"
                 placeholder="seu@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 style={{
-                  backgroundColor: '#28282E',
-                  borderColor: '#212121',
-                  color: 'white',
+                  backgroundColor: 'var(--cinza-azulado)',
+                  borderColor: 'var(--cinza-escuro)',
+                  color: 'var(--branco)',
+                  fontFamily: 'var(--font-secundaria)'
                 }}
               />
             </Form.Group>
 
             {/* Campo de Senha */}
             <Form.Group className="mb-4">
-              <Form.Label className="text-white">Senha</Form.Label>
+              <Form.Label className="text-white" style={{ fontFamily: 'var(--font-secundaria)' }}>Senha</Form.Label>
               <Form.Control
                 type="password"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 style={{
-                  backgroundColor: '#28282E',
-                  borderColor: '#212121',
-                  color: 'white',
+                  backgroundColor: 'var(--cinza-azulado)',
+                  borderColor: 'var(--cinza-escuro)',
+                  color: 'var(--branco)',
+                  fontFamily: 'var(--font-secundaria)'
                 }}
               />
             </Form.Group>
@@ -159,48 +164,49 @@ const LoginForm = () => {
               size="lg"
               disabled={loading}
               style={{
-                backgroundColor: '#E627F8',
-                borderColor: '#E627F8',
+                backgroundColor: 'var(--magenta)',
+                borderColor: 'var(--magenta)',
+                fontFamily: 'var(--font-secundaria)'
               }}
             >
               {loading ? 'Entrando...' : 'Entrar'}
             </Button>
 
-            {/* Link Esqueceu a Senha */}
+            {/* Link para abrir modal de recuperação de senha */}
             <div className="text-center mb-3">
               <button
                 type="button"
                 onClick={() => setShowForgotPassword(true)}
                 className="btn btn-link text-decoration-none"
-                style={{ color: '#6272A4' }}
+                style={{ color: 'var(--azul-acinzentado)', fontFamily: 'var(--font-secundaria)' }}
               >
                 Esqueceu a senha?
               </button>
             </div>
           </Form>
 
-          {/* Linha Divisória com gradiente */}
+          {/* Linha Divisória */}
           <hr className="divider-line" />
 
-          {/* Link Criar Conta */}
+          {/* Link para abrir modal de criar conta */}
           <div className="text-center mb-4">
             <button
               onClick={() => setShowCreateAccount(true)}
               className="btn btn-link text-decoration-none"
-              style={{ color: '#6272A4' }}
+              style={{ color: 'var(--azul-acinzentado)', fontFamily: 'var(--font-secundaria)' }}
             >
               Criar conta
             </button>
           </div>
 
           {/* Copyright */}
-          <div className="text-center" style={{ color: '#6272A4', fontSize: '0.875rem' }}>
+          <div className="text-center" style={{ color: 'var(--azul-acinzentado)', fontSize: '0.875rem', fontFamily: 'var(--font-secundaria)' }}>
             © 2025
           </div>
         </div>
       </Container>
 
-      {/* Modais */}
+      {/* Modais usados pela tela de login */}
       <CreateAccountModal 
         show={showCreateAccount} 
         onHide={() => setShowCreateAccount(false)} 

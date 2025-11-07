@@ -1,8 +1,9 @@
-// Modal exibido quando ocorre erro no login
+// Modal exibido quando ocorre erro no login (comentado em português)
 import { useState, useEffect, FormEvent } from 'react';
 import { Modal, Form, Button } from 'react-bootstrap';
 import { AlertCircle } from 'lucide-react';
 
+// Props: mensagem de erro, valores iniciais e callback para tentar novamente
 interface LoginErrorModalProps {
   show: boolean;
   onHide: () => void;
@@ -20,20 +21,40 @@ const LoginErrorModal = ({
   password: initialPassword, 
   onRetry 
 }: LoginErrorModalProps) => {
-  // Estados para armazenar os valores editados
+  // Estados para editar localmente email e senha antes de reenviar
   const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState(initialPassword);
 
-  // Atualiza os campos quando os props mudam
+  // Sincroniza os estados locais quando as props mudam
   useEffect(() => {
     setEmail(initialEmail);
     setPassword(initialPassword);
   }, [initialEmail, initialPassword]);
 
-  // Função que tenta fazer login novamente
+  // Handler: tenta submeter novamente os dados para login
+  // Observação: o componente pai espera um FormEvent semelhante ao de um submit
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    onRetry(e);
+    // Pegamos os campos diretamente do form para garantir os valores atuais
+    const form = e.target as HTMLFormElement;
+    const emailInput = form.elements.namedItem('email') as HTMLInputElement;
+    const passwordInput = form.elements.namedItem('password') as HTMLInputElement;
+    
+    if (emailInput && passwordInput) {
+      // Criamos um "evento sintético" com currentTarget contendo os inputs necessários
+      // Isso é consumido pelo handler de login no componente pai (que lê currentTarget.email.value)
+      const syntheticEvent = {
+        ...e,
+        currentTarget: {
+          email: emailInput,
+          password: passwordInput
+        }
+      } as unknown as FormEvent;
+      
+      // Chama o callback do pai para tentar login novamente
+      onRetry(syntheticEvent);
+    }
+    // Fecha o modal após disparar a tentativa
     onHide();
   };
 
@@ -45,7 +66,7 @@ const LoginErrorModal = ({
       contentClassName="bg-dark text-white"
     >
       <Modal.Header closeButton closeVariant="white" className="border-0">
-        {/* Ícone de erro */}
+        {/* Ícone de erro e título centralizados */}
         <div className="w-100 d-flex flex-column align-items-center mb-2">
           <div 
             className="rounded-circle d-flex align-items-center justify-content-center mb-3"
@@ -56,31 +77,34 @@ const LoginErrorModal = ({
               border: '2px solid rgba(230, 39, 248, 0.3)',
             }}
           >
-            <AlertCircle size={32} color="#E627F8" strokeWidth={2.5} />
+            <AlertCircle size={32} color="var(--magenta)" strokeWidth={2.5} />
           </div>
           <Modal.Title className="fw-bold">Erro de Login</Modal.Title>
         </div>
       </Modal.Header>
       
       <Modal.Body>
-        {/* Mensagem de erro */}
-        <p className="text-center mb-4" style={{ color: '#6272A4' }}>
+        {/* Mensagem de erro fornecida pelo pai */}
+        <p className="text-center mb-4" style={{ color: 'var(--azul-acinzentado)', fontFamily: 'var(--font-secundaria)' }}>
           {errorMessage}
         </p>
         
+        {/* Form que permite editar email/senha e reenviar */}
         <Form onSubmit={handleSubmit}>
           {/* Campo Email */}
           <Form.Group className="mb-3">
             <Form.Label>Email</Form.Label>
             <Form.Control
+              name="email"
               type="email"
               placeholder="seu@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               style={{
-                backgroundColor: '#28282E',
-                borderColor: '#212121',
-                color: 'white',
+                backgroundColor: 'var(--cinza-azulado)',
+                borderColor: 'var(--cinza-escuro)',
+                color: 'var(--branco)',
+                fontFamily: 'var(--font-secundaria)'
               }}
             />
           </Form.Group>
@@ -89,19 +113,21 @@ const LoginErrorModal = ({
           <Form.Group className="mb-4">
             <Form.Label>Senha</Form.Label>
             <Form.Control
+              name="password"
               type="password"
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               style={{
-                backgroundColor: '#28282E',
-                borderColor: '#212121',
-                color: 'white',
+                backgroundColor: 'var(--cinza-azulado)',
+                borderColor: 'var(--cinza-escuro)',
+                color: 'var(--branco)',
+                fontFamily: 'var(--font-secundaria)'
               }}
             />
           </Form.Group>
 
-          {/* Botões */}
+          {/* Botões: cancelar ou tentar novamente */}
           <div className="d-flex gap-2">
             <Button 
               variant="outline-secondary" 
@@ -114,8 +140,9 @@ const LoginErrorModal = ({
               type="submit" 
               className="flex-fill fw-bold"
               style={{
-                backgroundColor: '#E627F8',
-                borderColor: '#E627F8',
+                backgroundColor: 'var(--magenta)',
+                borderColor: 'var(--magenta)',
+                fontFamily: 'var(--font-principal)'
               }}
             >
               Tentar Novamente

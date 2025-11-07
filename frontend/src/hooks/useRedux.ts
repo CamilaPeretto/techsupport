@@ -1,9 +1,9 @@
-// Hooks customizados do Redux com tipagem
+// Hooks customizados do Redux com tipagem para evitar casts espalhados
 import { useDispatch, useSelector, TypedUseSelectorHook } from 'react-redux';
 import type { RootState, AppDispatch } from '../store/store';
 
-// Hook useDispatch tipado
+// useAppDispatch: wrapper tipado de useDispatch para usar AppDispatch
 export const useAppDispatch = () => useDispatch<AppDispatch>();
 
-// Hook useSelector tipado
+// useAppSelector: wrapper tipado de useSelector para usar RootState
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;

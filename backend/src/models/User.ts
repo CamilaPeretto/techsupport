@@ -1,18 +1,19 @@
 import mongoose, { Document, Schema } from "mongoose";
 
-// Interface para o documento do usuário
+// Interface TypeScript para o documento de usuário
 export interface IUser extends Document {
   name: string;
   email: string;
-  password: string;
-  role: "tech" | "user";
+  password: string; // hash da senha
+  role: "tech" | "user"; // combinador para papéis
   department?: string;
   position?: string;
   createdAt: Date;
   updatedAt: Date;
 }
 
-// Schema do usuário
+// Schema do usuário.
+// Observações de segurança: não exponha o campo `password` via select em endpoints públicos.
 const UserSchema: Schema = new Schema(
   {
     name: {
@@ -47,9 +48,10 @@ const UserSchema: Schema = new Schema(
     },
   },
   {
+    // timestamps cria createdAt e updatedAt automaticamente
     timestamps: true,
   }
 );
 
-// Exporta o modelo
+// Exporta o modelo Mongoose criado a partir do schema e interface
 export default mongoose.model<IUser>("User", UserSchema);

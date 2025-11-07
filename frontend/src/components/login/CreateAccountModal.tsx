@@ -2,11 +2,13 @@ import { useState, FormEvent } from 'react';
 import { Modal, Form, Button, Toast, ToastContainer } from 'react-bootstrap';
 import api from '../../services/api';
 
+// Props do modal: controlar exibição e callback de fechamento
 interface CreateAccountModalProps {
   show: boolean;
   onHide: () => void;
 }
 
+// Estrutura do formulário localmente (tipada)
 interface FormData {
   name: string;
   email: string;
@@ -14,6 +16,7 @@ interface FormData {
   confirmPassword: string;
 }
 
+// Componente principal do modal de criação de conta
 const CreateAccountModal = ({ show, onHide }: CreateAccountModalProps) => {
   // Estado que armazena todos os dados do formulário
   const [formData, setFormData] = useState<FormData>({
@@ -23,24 +26,24 @@ const CreateAccountModal = ({ show, onHide }: CreateAccountModalProps) => {
     confirmPassword: '',
   });
 
-  // Estado para controlar toast
+  // Estado para controlar exibição do toast e seu conteúdo
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastVariant, setToastVariant] = useState<'success' | 'danger'>('success');
 
-  // Atualiza um campo específico do formulário
+  // Atualiza um campo específico do formulário (campo controlado)
   const handleChange = (field: keyof FormData, value: string) => {
     setFormData({ ...formData, [field]: value });
   };
 
-  // Mostra toast com mensagem
+  // Mostra toast com mensagem e tipo (success/danger)
   const showMessage = (message: string, variant: 'success' | 'danger' = 'danger') => {
     setToastMessage(message);
     setToastVariant(variant);
     setShowToast(true);
   };
 
-  // Função que processa o envio do formulário
+  // Função que processa o envio do formulário para a API
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
@@ -50,7 +53,7 @@ const CreateAccountModal = ({ show, onHide }: CreateAccountModalProps) => {
       return;
     }
 
-    // Validação 2: Verifica se o email é válido
+    // Validação 2: Verifica se o email tem um formato mínimo aceitável
     if (!formData.email.includes('@')) {
       showMessage('Por favor, insira um email válido.');
       return;
@@ -75,9 +78,10 @@ const CreateAccountModal = ({ show, onHide }: CreateAccountModalProps) => {
         email: formData.email,
         password: formData.password,
       });
+      // Exibe feedback de sucesso
       showMessage('Conta criada com sucesso!', 'success');
       
-      // Limpa os campos e fecha o modal após 1 segundo
+      // Limpa os campos e fecha o modal após 1 segundo para melhor UX
       setTimeout(() => {
         setFormData({
           name: '',
@@ -88,6 +92,7 @@ const CreateAccountModal = ({ show, onHide }: CreateAccountModalProps) => {
         onHide();
       }, 1000);
     } catch (error: unknown) {
+      // Normaliza mensagem de erro para exibição
       const msg = error instanceof Error ? error.message : 'Erro ao criar conta';
       showMessage(msg);
     }
@@ -95,6 +100,7 @@ const CreateAccountModal = ({ show, onHide }: CreateAccountModalProps) => {
 
   return (
     <>
+      {/* Modal centralizado com tema escuro */}
       <Modal 
         show={show} 
         onHide={onHide} 
@@ -106,6 +112,7 @@ const CreateAccountModal = ({ show, onHide }: CreateAccountModalProps) => {
         </Modal.Header>
         
         <Modal.Body>
+          {/* Formulário de criação de conta */}
           <Form onSubmit={handleSubmit}>
             {/* Campo Nome */}
             <Form.Group className="mb-3">
@@ -116,9 +123,10 @@ const CreateAccountModal = ({ show, onHide }: CreateAccountModalProps) => {
                 value={formData.name}
                 onChange={(e) => handleChange('name', e.target.value)}
                 style={{
-                  backgroundColor: '#28282E',
-                  borderColor: '#212121',
-                  color: 'white',
+                  backgroundColor: 'var(--cinza-azulado)',
+                  borderColor: 'var(--cinza-escuro)',
+                  color: 'var(--branco)',
+                  fontFamily: 'var(--font-secundaria)'
                 }}
               />
             </Form.Group>
@@ -132,9 +140,10 @@ const CreateAccountModal = ({ show, onHide }: CreateAccountModalProps) => {
                 value={formData.email}
                 onChange={(e) => handleChange('email', e.target.value)}
                 style={{
-                  backgroundColor: '#28282E',
-                  borderColor: '#212121',
-                  color: 'white',
+                  backgroundColor: 'var(--cinza-azulado)',
+                  borderColor: 'var(--cinza-escuro)',
+                  color: 'var(--branco)',
+                  fontFamily: 'var(--font-secundaria)'
                 }}
               />
             </Form.Group>
@@ -148,9 +157,10 @@ const CreateAccountModal = ({ show, onHide }: CreateAccountModalProps) => {
                 value={formData.password}
                 onChange={(e) => handleChange('password', e.target.value)}
                 style={{
-                  backgroundColor: '#28282E',
-                  borderColor: '#212121',
-                  color: 'white',
+                  backgroundColor: 'var(--cinza-azulado)',
+                  borderColor: 'var(--cinza-escuro)',
+                  color: 'var(--branco)',
+                  fontFamily: 'var(--font-secundaria)'
                 }}
               />
             </Form.Group>
@@ -164,21 +174,23 @@ const CreateAccountModal = ({ show, onHide }: CreateAccountModalProps) => {
                 value={formData.confirmPassword}
                 onChange={(e) => handleChange('confirmPassword', e.target.value)}
                 style={{
-                  backgroundColor: '#28282E',
-                  borderColor: '#212121',
-                  color: 'white',
+                  backgroundColor: 'var(--cinza-azulado)',
+                  borderColor: 'var(--cinza-escuro)',
+                  color: 'var(--branco)',
+                  fontFamily: 'var(--font-secundaria)'
                 }}
               />
             </Form.Group>
 
-            {/* Botão Criar Conta */}
+            {/* Botão Criar Conta (submete o formulário) */}
             <Button 
               type="submit" 
               className="w-100 fw-bold"
               size="lg"
               style={{
-                backgroundColor: '#E627F8',
-                borderColor: '#E627F8',
+                backgroundColor: 'var(--magenta)',
+                borderColor: 'var(--magenta)',
+                fontFamily: 'var(--font-principal)'
               }}
             >
               Criar Conta
@@ -187,7 +199,7 @@ const CreateAccountModal = ({ show, onHide }: CreateAccountModalProps) => {
         </Modal.Body>
       </Modal>
 
-      {/* Toast para mensagens */}
+      {/* Toast para mensagens (sucesso/erro) */}
       <ToastContainer position="top-end" className="p-3">
         <Toast 
           show={showToast} 

@@ -1,8 +1,14 @@
+// Componente CustomBadge
+// Comentários em português: componente pequeno que mapeia valores de 'status' ou 'priority'
+// para estilos (background/text) via variáveis CSS do tema.
 import React from 'react';
 
 interface CustomBadgeProps {
+  // conteúdo exibido dentro do badge (normalmente o rótulo legível)
   children: React.ReactNode;
+  // tipo define o conjunto de cores a ser usado (status x prioridade)
   type: 'status' | 'priority';
+  // valor que será mapeado para cores (ex: 'open', 'high')
   value: string;
   className?: string;
 }
@@ -13,23 +19,30 @@ const CustomBadge: React.FC<CustomBadgeProps> = ({
   value,
   className = '' 
 }) => {
+  // Retorna um objeto de estilo inline baseado no tipo e no valor.
+  // Usa variáveis CSS (themes) para manter consistência visual no app.
   const getBadgeStyle = (): React.CSSProperties => {
+    // Mapa de cores para status (valores esperados em inglês para compatibilidade com TicketRow)
     const statusColors: Record<string, { bg: string; text: string }> = {
-      'open': { bg: 'rgba(0, 123, 255, 0.2)', text: '#007BFF' },
-      'pending': { bg: 'rgba(0, 123, 255, 0.2)', text: '#007BFF' },
-      'in-progress': { bg: 'rgba(138, 43, 226, 0.2)', text: '#8A2BE2' },
-      'completed': { bg: 'rgba(40, 167, 69, 0.2)', text: '#28A745' }
+      'open': { bg: 'var(--status-open-bg)', text: 'var(--status-open)' },
+      'pending': { bg: 'var(--status-open-bg)', text: 'var(--status-open)' },
+      'in-progress': { bg: 'var(--status-in-progress-bg)', text: 'var(--status-in-progress)' },
+      'completed': { bg: 'var(--status-completed-bg)', text: 'var(--status-completed)' }
     };
 
+    // Mapa de cores para prioridade
     const priorityColors: Record<string, { bg: string; text: string }> = {
-      'high': { bg: 'rgba(255, 0, 7, 0.2)', text: '#FF0007' },
-      'medium': { bg: 'rgba(255, 132, 27, 0.2)', text: '#FF841B' },
-      'low': { bg: 'rgba(255, 215, 0, 0.2)', text: '#FFD700' }
+      'high': { bg: 'var(--priority-high-bg)', text: 'var(--priority-high)' },
+      'medium': { bg: 'var(--priority-medium-bg)', text: 'var(--priority-medium)' },
+      'low': { bg: 'var(--priority-low-bg)', text: 'var(--priority-low)' }
     };
 
+    // Escolhe o mapa correto conforme o tipo
     const colorMap = type === 'status' ? statusColors : priorityColors;
-    const colors = colorMap[value.toLowerCase()] || { bg: 'rgba(98, 114, 164, 0.2)', text: '#6272A4' };
+    // Faz lookup com lowercase para ser robusto a casing
+    const colors = colorMap[value.toLowerCase()] || { bg: 'var(--neutral-info-bg)', text: 'var(--neutral-info)' };
 
+    // Estilos base do badge (inline para simplicidade e consistência)
     return {
       backgroundColor: colors.bg,
       color: colors.text,
@@ -37,12 +50,13 @@ const CustomBadge: React.FC<CustomBadgeProps> = ({
       borderRadius: '16px',
       fontSize: '12px',
       fontWeight: 600,
-      fontFamily: 'Inter, sans-serif',
+      fontFamily: 'var(--font-secundaria)',
       display: 'inline-flex',
       alignItems: 'center',
       justifyContent: 'center',
       minWidth: '80px',
       whiteSpace: 'nowrap',
+      // borda sutil usando a cor de texto com transparência
       border: `1px solid ${colors.text}20`
     };
   };

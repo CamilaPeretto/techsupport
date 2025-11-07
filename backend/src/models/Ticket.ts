@@ -1,31 +1,31 @@
 import mongoose, { Document, Schema } from "mongoose";
 
-// Interface para o documento do ticket
+// Interface para o documento do ticket (tipagem TypeScript)
 export interface ITicket extends Document {
-  ticketNumber?: number;
+  ticketNumber?: number; // número sequencial do ticket (gerado via Counter)
   title: string;
   description?: string;
   status: "aberto" | "em andamento" | "concluído";
   type?: "hardware" | "software" | "rede" | "outros";
   createdAt: Date;
-  userId: mongoose.Types.ObjectId;
-  assignedTo?: mongoose.Types.ObjectId; // Técnico responsável
+  userId: mongoose.Types.ObjectId; // referência ao usuário que abriu o ticket
+  assignedTo?: mongoose.Types.ObjectId; // técnico responsável (ref User)
   priority?: "baixa" | "média" | "alta";
-  resolution?: string;
-  resolvedAt?: Date | null;
+  resolution?: string; // texto de resolução
+  resolvedAt?: Date | null; // data de resolução
   resolutionNotes?: { text: string; at: Date; by?: mongoose.Types.ObjectId }[];
-  statusHistory?: { 
-    status: string; 
-    changedAt: Date; 
+  statusHistory?: {
+    status: string;
+    changedAt: Date;
     changedBy?: mongoose.Types.ObjectId;
     assignedTechnicianName?: string;
   }[];
-  assignedAt?: Date | null;
-  inProgressAt?: Date | null;
+  assignedAt?: Date | null; // quando foi atribuído
+  inProgressAt?: Date | null; // quando entrou em andamento
   updatedAt: Date;
 }
 
-// Schema do ticket
+// Schema do ticket com campos essenciais e arrays de histórico
 const TicketSchema: Schema = new Schema(
   {
     ticketNumber: {
@@ -100,9 +100,10 @@ const TicketSchema: Schema = new Schema(
     },
   },
   {
+    // timestamps adiciona createdAt e updatedAt automaticamente
     timestamps: true,
   }
 );
 
-// Exporta o modelo
+// Exporta o modelo Mongoose para uso na aplicação
 export default mongoose.model<ITicket>("Ticket", TicketSchema);

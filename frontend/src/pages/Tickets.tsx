@@ -9,22 +9,27 @@ import NewTicketModal from '../components/tickets/NewTicketModal';
 import TicketDetailModal from '../components/tickets/TicketDetailModal';
 import { Form } from 'react-bootstrap';
 
+// Página principal de Tickets: lista, filtros e ações (abrir, atribuir, ver detalhe)
 const Tickets: React.FC = () => {
   const dispatch = useAppDispatch();
+
+  // Seletores do Redux: itens do slice de tickets e dados do usuário
   const { items, loading } = useAppSelector(s => s.tickets);
   const user = useAppSelector(s => s.auth.user);
+
+  // Estado local para filtros, modais e seleção de ticket
   const [filters, setFilters] = useState<{ status?: DomainTicket['status']; priority?: DomainTicket['priority']; fromDate?: string; toDate?: string }>({});
   const [assignTicketId, setAssignTicketId] = useState<string | null>(null);
   const [showNewTicket, setShowNewTicket] = useState(false);
   const [showDetailTicket, setShowDetailTicket] = useState(false);
   const [detailTicketId, setDetailTicketId] = useState<string | null>(null);
 
-  // Carrega todos os tickets na montagem
+  // Carrega tickets do servidor ao montar o componente
   useEffect(() => {
     dispatch(fetchTickets({}));
   }, [dispatch]);
 
-  // Listener para o botão do Header
+  // Escuta eventos globais (disparados pelo Header) para abrir modal de novo ticket
   useEffect(() => {
     const handleOpenModal = () => {
       if (!user?.id) { alert('Faça login para criar tickets.'); return; }
@@ -34,11 +39,12 @@ const Tickets: React.FC = () => {
     return () => window.removeEventListener('openNewTicketModal', handleOpenModal);
   }, [user?.id]);
 
-  // Filtra localmente: não atribuídos OU atribuídos ao próprio técnico
+  // Filtragem local: mostra apenas tickets não atribuídos ou atribuídos ao técnico atual
   const filteredItems = useMemo(() => {
     return items.filter(t => !t.assignedTo || t.assignedTo._id === user?.id);
   }, [items, user?.id]);
 
+  // Estatísticas derivadas (cards de resumo)
   const stats = useMemo(() => {
     const inProgress = filteredItems.filter(t => t.status === 'em andamento').length;
     const completed = filteredItems.filter(t => t.status === 'concluído').length;
@@ -46,6 +52,7 @@ const Tickets: React.FC = () => {
     return { inProgress, completed, unassigned };
   }, [filteredItems]);
 
+  // Mapeamentos para o formato da tabela (normalize domain -> ui)
   type TableTicket = {
     id: string;
     ticketNumber?: number;
@@ -57,6 +64,7 @@ const Tickets: React.FC = () => {
     requestingEmployee?: string;
   };
 
+  // Converte status do domínio para os valores esperados pela tabela
   const mapStatusToTable = (s: DomainTicket['status']): TableTicket['status'] => {
     switch (s) {
       case 'aberto':
@@ -70,6 +78,7 @@ const Tickets: React.FC = () => {
     }
   };
 
+  // Converte prioridade do domínio para os valores da tabela
   const mapPriorityToTable = (p: DomainTicket['priority']): TableTicket['priority'] => {
     switch (p) {
       case 'alta':
@@ -83,6 +92,7 @@ const Tickets: React.FC = () => {
     }
   };
 
+  // Gera o array que será passado para o componente TicketTable
   const tableTickets: TableTicket[] = filteredItems.map((t) => ({
     id: t._id,
     ticketNumber: t.ticketNumber,
@@ -94,6 +104,7 @@ const Tickets: React.FC = () => {
     requestingEmployee: undefined,
   }));
 
+  // Handler para abrir modal de detalhe quando a linha da tabela é clicada
   const handleTicketClick = (t: TableTicket) => {
     setDetailTicketId(t.id);
     setShowDetailTicket(true);
@@ -101,7 +112,7 @@ const Tickets: React.FC = () => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '1.75rem', paddingBottom: '2rem' }}>
-      {/* Dashboard - Cards de estatísticas */}
+      {/* Painel superior: cards com métricas */}
       <div style={{ 
         display: 'grid', 
         gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
@@ -112,7 +123,7 @@ const Tickets: React.FC = () => {
         <StatsCard title="Não Atribuídos" value={stats.unassigned} icon={<TicketIcon size={24} />} />
       </div>
 
-      {/* Filtros */}
+      {/* Caixa de filtros */}
       <div style={{ 
         backgroundColor: 'var(--preto)',
         border: '1px solid var(--magenta)',
@@ -121,6 +132,7 @@ const Tickets: React.FC = () => {
         boxShadow: '0 0 12px rgba(230, 39, 248, 0.4)'
       }}>
         <Form className="row g-3 justify-content-md-between" aria-label="Filtros de tickets">
+          {/* Select de status */}
           <div className="col-12 col-md-2">
             <Form.Label className="text-white">Status</Form.Label>
             <Form.Select value={filters.status || ''} onChange={(e) => { const v = e.target.value as '' | "aberto" | "em andamento" | "concluído"; setFilters(f => ({ ...f, status: v || undefined })); }} aria-label="Filtro de status">
@@ -130,6 +142,8 @@ const Tickets: React.FC = () => {
               <option value="concluído">Concluído</option>
             </Form.Select>
           </div>
+
+          {/* Select de prioridade */}
           <div className="col-12 col-md-2">
             <Form.Label className="text-white">Prioridade</Form.Label>
             <Form.Select value={filters.priority || ''} onChange={(e) => { const v = e.target.value as '' | 'baixa' | 'média' | 'alta'; setFilters(f => ({ ...f, priority: v || undefined })); }} aria-label="Filtro de prioridade">
@@ -139,6 +153,8 @@ const Tickets: React.FC = () => {
               <option value="alta">Alta</option>
             </Form.Select>
           </div>
+
+          {/* Intervalo de datas */}
           <div className="col-6 col-md-2">
             <Form.Label className="text-white">De</Form.Label>
             <Form.Control type="date" value={filters.fromDate || ''} onChange={(e) => setFilters(f => ({ ...f, fromDate: e.target.value || undefined }))} aria-label="Data inicial" />
@@ -147,6 +163,8 @@ const Tickets: React.FC = () => {
             <Form.Label className="text-white">Até</Form.Label>
             <Form.Control type="date" value={filters.toDate || ''} onChange={(e) => setFilters(f => ({ ...f, toDate: e.target.value || undefined }))} aria-label="Data final" />
           </div>
+
+          {/* Botões Filtrar / Limpar */}
           <div className="col-12 col-md-3 d-flex align-items-end justify-content-end gap-2">
             <button 
               type="button"
@@ -166,6 +184,7 @@ const Tickets: React.FC = () => {
               onMouseOver={(e) => (e.currentTarget.style.backgroundColor = 'var(--cinza-azulado)')}
               onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'var(--magenta)')}
               onClick={() => {
+                // Dispara fetch com os filtros aplicados
                 dispatch(fetchTickets({ status: filters.status, priority: filters.priority, fromDate: filters.fromDate, toDate: filters.toDate }));
               }}
             >
@@ -195,6 +214,7 @@ const Tickets: React.FC = () => {
                 e.currentTarget.style.transform = 'scale(1)';
               }}
               onClick={() => {
+                // Limpa filtros e recarrega
                 setFilters({});
                 dispatch(fetchTickets({}));
               }}
@@ -205,6 +225,7 @@ const Tickets: React.FC = () => {
         </Form>
       </div>
 
+      {/* Área principal: tabela de tickets */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         {loading ? (
           <div>Carregando...</div>
@@ -217,6 +238,7 @@ const Tickets: React.FC = () => {
         )}
       </div>
 
+      {/* Modais: Atribuir, Novo Ticket e Detalhe */}
       <AssignModal ticketId={assignTicketId} show={!!assignTicketId} onClose={() => setAssignTicketId(null)} onAssigned={() => dispatch(fetchTickets({}))} />
       <NewTicketModal show={showNewTicket} onClose={() => setShowNewTicket(false)} />
       <TicketDetailModal 

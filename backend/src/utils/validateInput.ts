@@ -1,16 +1,17 @@
 import validator from "validator";
 
-// Função para validar email
+// Valida um email usando a biblioteca validator
 export const validateEmail = (email: string): boolean => {
   return validator.isEmail(email);
 };
 
-// Função para validar senha (mínimo 6 caracteres)
+// Validação simples de senha (mínimo 6 caracteres)
 export const validatePassword = (password: string): boolean => {
   return password.length >= 6;
 };
 
-// Função para validar entrada de usuário
+// Valida combinações de entrada para endpoints de usuário (ex: login/registro)
+// Retorna um objeto com isValid e lista de mensagens de erro legíveis.
 export const validateUserInput = (
   email: string,
   password: string

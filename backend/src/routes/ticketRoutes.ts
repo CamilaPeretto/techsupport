@@ -7,26 +7,32 @@ import {
   assignTicket,
   deleteTicket,
 } from "../controllers/ticketController";
-import { requireTech } from "../middleware/requireTech";
+import { requireTech } from "../middleware/auth";
 
 const router = Router();
 
-// Criar novo ticket (usuários e técnicos)
+// POST /api/tickets/
+// Rota para criação de um novo ticket. Pode ser usada por usuários e técnicos.
 router.post("/", createTicket);
 
-// Listar todos os tickets (para técnicos)
+// GET /api/tickets/
+// Lista tickets — a lógica de filtragem/visibilidade está no controller
 router.get("/", getAllTickets);
 
-// Obter ticket específico por ID (usuários e técnicos)
+// GET /api/tickets/:id
+// Recupera um ticket por ID (usuários podem ver seus próprios tickets)
 router.get("/:id", getTicketById);
 
-// Atualizar status do ticket (APENAS técnicos)
+// PUT /api/tickets/:id/status
+// Atualiza o status do ticket — protegido para técnicos apenas
 router.put("/:id/status", requireTech, updateTicketStatus);
 
-// Atribuir ticket a um técnico (APENAS técnicos)
+// PUT /api/tickets/:id/assign
+// Atribui um ticket a um técnico — protegido para técnicos apenas
 router.put("/:id/assign", requireTech, assignTicket);
 
-// Deletar ticket (APENAS técnicos)
+// DELETE /api/tickets/:id
+// Deleta um ticket — protegido para técnicos apenas
 router.delete("/:id", requireTech, deleteTicket);
 
 export default router;

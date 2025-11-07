@@ -1,3 +1,5 @@
+// Modal para criação de um novo chamado
+// Comentários em português explicando estados e fluxo
 import React, { useEffect, useState } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import { useAppDispatch, useAppSelector } from '../../hooks/useRedux';
@@ -9,13 +11,18 @@ type Props = {
 };
 
 const NewTicketModal: React.FC<Props> = ({ show, onClose }) => {
+  // Dispatch para criar o chamado via thunk
   const dispatch = useAppDispatch();
+  // Usuário logado (necessário para vincular o chamado)
   const user = useAppSelector(s => s.auth.user);
+
+  // Estados locais para os campos do formulário
   const [title, setTitle] = useState('');
   const [priority, setPriority] = useState<TicketPriority>('média');
   const [description, setDescription] = useState('');
   const [saving, setSaving] = useState(false);
 
+  // Ao fechar o modal, limpa os campos para a próxima abertura
   useEffect(() => {
     if (!show) {
       setTitle('');
@@ -25,12 +32,13 @@ const NewTicketModal: React.FC<Props> = ({ show, onClose }) => {
     }
   }, [show]);
 
+  // Envia os dados para o store (createTicket é um thunk que chama a API)
   const handleSave = async () => {
-    if (!title.trim() || !user?.id) return;
+    if (!title.trim() || !user?.id) return; // validação mínima
     setSaving(true);
     try {
       await dispatch(createTicket({ title: title.trim(), description: description.trim() || undefined, priority, userId: user.id })).unwrap();
-      onClose();
+      onClose(); // fecha o modal após salvar com sucesso
     } finally {
       setSaving(false);
     }

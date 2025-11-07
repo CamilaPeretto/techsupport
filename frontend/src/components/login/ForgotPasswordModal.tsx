@@ -1,49 +1,53 @@
-// Modal para recuperação de senha
+// Modal para recuperação de senha (comentários adicionados)
 import { useState, FormEvent } from 'react';
 import { Modal, Form, Button, Toast, ToastContainer } from 'react-bootstrap';
 
+// Props simples: controla se o modal está visível e callback de fechamento
 interface ForgotPasswordModalProps {
   show: boolean;
   onHide: () => void;
 }
 
 const ForgotPasswordModal = ({ show, onHide }: ForgotPasswordModalProps) => {
+  // Campo de email controlado
   const [email, setEmail] = useState('');
   
-  // Estado para controlar toast
+  // Estado para controlar exibição do toast (mensagens de sucesso/erro)
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastVariant, setToastVariant] = useState<'success' | 'danger'>('success');
 
-  // Mostra toast com mensagem
+  // Helper: mostra uma mensagem rápida via Toast
   const showMessage = (message: string, variant: 'success' | 'danger' = 'danger') => {
     setToastMessage(message);
     setToastVariant(variant);
     setShowToast(true);
   };
 
-  // Função que processa o envio do formulário
+  // Handler do formulário: validações locais e placeholder de funcionalidade
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
 
-    // Validação 1: Verifica se o email foi preenchido
+    // Validação 1: email preenchido
     if (!email) {
       showMessage('Por favor, insira seu email.');
       return;
     }
 
-    // Validação 2: Verifica se o email é válido
+    // Validação 2: formato mínimo de email
     if (!email.includes('@')) {
       showMessage('Por favor, insira um email válido.');
       return;
     }
 
-    // Funcionalidade de recuperação de senha ainda não implementada no backend
-    showMessage('Funcionalidade de recuperação de senha em desenvolvimento. Entre em contato com o suporte.', 'danger');
+    // Observação: endpoint de recuperação pode não estar implementado no backend ainda.
+    // Aqui exibimos uma mensagem informativa. Quando o backend estiver pronto, substituir por chamada API.
+    showMessage('Funcionalidade em desenvolvimento. Para recuperação de senha, envie um email para: suporte@techsupport.com', 'danger');
   };
 
   return (
     <>
+      {/* Modal centralizado com tema escuro */}
       <Modal 
         show={show} 
         onHide={onHide} 
@@ -55,12 +59,13 @@ const ForgotPasswordModal = ({ show, onHide }: ForgotPasswordModalProps) => {
         </Modal.Header>
         
         <Modal.Body>
-          <p className="mb-4" style={{ color: '#6272A4' }}>
+          {/* Instrução breve para o usuário */}
+          <p className="mb-4" style={{ color: 'var(--azul-acinzentado)', fontFamily: 'var(--font-secundaria)' }}>
             Digite seu email para receber instruções de recuperação de senha.
           </p>
           
           <Form onSubmit={handleSubmit}>
-            {/* Campo Email */}
+            {/* Campo de email controlado */}
             <Form.Group className="mb-4">
               <Form.Label>Email</Form.Label>
               <Form.Control
@@ -69,21 +74,23 @@ const ForgotPasswordModal = ({ show, onHide }: ForgotPasswordModalProps) => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 style={{
-                  backgroundColor: '#28282E',
-                  borderColor: '#212121',
-                  color: 'white',
+                  backgroundColor: 'var(--cinza-azulado)',
+                  borderColor: 'var(--cinza-escuro)',
+                  color: 'var(--branco)',
+                  fontFamily: 'var(--font-secundaria)'
                 }}
               />
             </Form.Group>
 
-            {/* Botão Enviar */}
+            {/* Botão que dispara validação / envio */}
             <Button 
               type="submit" 
               className="w-100 fw-bold"
               size="lg"
               style={{
-                backgroundColor: '#E627F8',
-                borderColor: '#E627F8',
+                backgroundColor: 'var(--magenta)',
+                borderColor: 'var(--magenta)',
+                fontFamily: 'var(--font-principal)'
               }}
             >
               Enviar
@@ -92,7 +99,7 @@ const ForgotPasswordModal = ({ show, onHide }: ForgotPasswordModalProps) => {
         </Modal.Body>
       </Modal>
 
-      {/* Toast para mensagens */}
+      {/* Toast para mensagens curtas (sucesso/erro) */}
       <ToastContainer position="top-end" className="p-3">
         <Toast 
           show={showToast} 

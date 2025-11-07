@@ -1,32 +1,37 @@
-// Importa o mongoose, biblioteca para conectar e interagir com o MongoDB
+// Mongoose: ORM/ODM para MongoDB
 import mongoose from "mongoose";
-// Carrega variáveis de ambiente do arquivo .env
+// dotenv para carregar variáveis de ambiente (DB_USER, DB_PASS, etc.)
 import dotenv from "dotenv";
 
+// Carrega .env — importante antes de ler process.env
 dotenv.config();
 
-// Define uma configuração do mongoose para evitar warnings de consultas antigas
+// Evita warnings ao usar consultas com certas opções (compatibilidade)
 mongoose.set("strictQuery", true);
 
-// Lê o usuário e senha do banco de dados do arquivo .env
+// Credenciais lidas do ambiente. Podem ser undefined em dev local.
 const dbUser = process.env.DB_USER;
 const dbPassword = process.env.DB_PASS;
 
-// Função assíncrona para conectar ao MongoDB
+/**
+ * Conecta ao MongoDB usando mongoose.connect.
+ * A função lança uma saída de erro e encerra o processo em caso de falha,
+ * pois a aplicação depende do banco para funcionar corretamente.
+ */
 async function connectDB(): Promise<void> {
   try {
-    // Faz a conexão com o banco no MongoDB Atlas usando credenciais e URI
+    // Monta a connection string para MongoDB Atlas. Em produção, valide a string
+    // e evite colocar credenciais diretamente no repositório.
     await mongoose.connect(
       `mongodb+srv://${dbUser}:${dbPassword}@cluster0.cb7ikw0.mongodb.net/TechSupport?retryWrites=true&w=majority&appName=Cluster0`
     );
-    // Se der certo, exibe uma mensagem no console
     console.log("Conectou ao banco de dados!");
   } catch (error) {
-    // Se der erro, exibe o erro e encerra a aplicação
+    // Em caso de erro fatal de conexão, logamos e encerramos com código 1
     console.error("Erro ao conectar no banco:", error);
-    process.exit(1); // força o encerramento do processo
+    process.exit(1);
   }
 }
 
-// Exporta a função para ser usada em outro arquivo (server.js)
+// Exporta a função de conexão para ser usada no processo de startup
 export default connectDB;

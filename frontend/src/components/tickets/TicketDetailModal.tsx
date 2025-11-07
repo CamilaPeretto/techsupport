@@ -1,3 +1,5 @@
+// Modal de detalhe do chamado: exibe informações completas, linha do tempo e ações
+// Comentários em português para explicar tipos, efeitos e exibições condicionais
 import React, { useEffect, useState } from 'react';
 import { Modal, Button, Badge } from 'react-bootstrap';
 import api from '../../services/api';
@@ -5,6 +7,7 @@ import { useAppSelector } from '../../hooks/useRedux';
 import AssignModal from './AssignModal';
 import StatusUpdateModalSimple from './StatusUpdateModalSimple';
 
+// Tipo local que representa a resposta detalhada do ticket da API
 type TicketDetail = {
   _id: string;
   ticketNumber?: number;
@@ -37,12 +40,16 @@ type Props = {
 };
 
 const TicketDetailModal: React.FC<Props> = ({ show, ticketId, onClose, onRefresh }) => {
+  // Estado local para o ticket carregado e flags de UI
   const [ticket, setTicket] = useState<TicketDetail | null>(null);
   const [loading, setLoading] = useState(false);
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [showStatusModal, setShowStatusModal] = useState(false);
+
+  // Usuário logado (usado para controlar permissões/visibilidade de botões)
   const user = useAppSelector(s => s.auth.user);
 
+  // Efeito para buscar os detalhes do ticket quando o modal abre
   useEffect(() => {
     if (!show || !ticketId) return;
     const fetchTicket = async () => {
@@ -59,27 +66,30 @@ const TicketDetailModal: React.FC<Props> = ({ show, ticketId, onClose, onRefresh
     fetchTicket();
   }, [show, ticketId]);
 
+  // Callback chamado quando a atribuição é concluída: fecha modal filho e recarrega dados
   const handleAssigned = () => {
     setShowAssignModal(false);
-    // Recarrega o ticket
+    // Recarrega o ticket do servidor para refletir a atribuição
     if (ticketId) {
       api.get(`/api/tickets/${ticketId}`).then(({ data }) => setTicket(data));
     }
     onRefresh?.();
   };
 
+  // Callback chamado quando o status é atualizado: fecha modal filho e recarrega
   const handleStatusUpdated = () => {
     setShowStatusModal(false);
-    // Recarrega o ticket
     if (ticketId) {
       api.get(`/api/tickets/${ticketId}`).then(({ data }) => setTicket(data));
     }
     onRefresh?.();
   };
 
+  // Helpers booleanos para controlar visibilidade de ações
   const isAssignedToCurrentUser = ticket?.assignedTo?._id === user?.id;
   const isNotAssigned = !ticket?.assignedTo;
 
+  // Mapeamentos para rótulos legíveis
   const getStatusLabel = (status: string) => {
     switch (status) {
       case 'aberto': return 'Aberto';
@@ -105,11 +115,14 @@ const TicketDetailModal: React.FC<Props> = ({ show, ticketId, onClose, onRefresh
       </Modal.Header>
       <Modal.Body>
         {loading ? (
+          // Estado de carregamento enquanto busca dados
           <div className="text-center py-4">Carregando...</div>
         ) : ticket ? (
+          // Renderiza detalhes quando o ticket está disponível
           <div>
             <div className="mb-3">
               <h5 className="text-white mb-2">
+                {/* Identificador amigável: usa ticketNumber quando disponível */}
                 {ticket.ticketNumber ? `#${ticket.ticketNumber}` : `#${ticket._id.slice(-6)}`} - {ticket.title}
               </h5>
               {ticket.description && (
@@ -121,6 +134,7 @@ const TicketDetailModal: React.FC<Props> = ({ show, ticketId, onClose, onRefresh
               <div className="col-md-6">
                 <strong className="text-white">Status:</strong>
                 <div className="mt-1">
+                  {/* Badge de status com cor baseada no estado */}
                   <Badge bg={ticket.status === 'concluído' ? 'success' : ticket.status === 'em andamento' ? 'warning' : 'secondary'}>
                     {getStatusLabel(ticket.status)}
                   </Badge>
@@ -171,7 +185,7 @@ const TicketDetailModal: React.FC<Props> = ({ show, ticketId, onClose, onRefresh
               )}
             </div>
 
-            {/* Linha do Tempo */}
+            {/* Linha do Tempo: mostra eventos relevantes (criação, atribuição, progresso, conclusão) */}
             <div className="mt-4">
               <h6 className="text-white mb-3">Linha do Tempo</h6>
               <div className="timeline">
@@ -186,7 +200,7 @@ const TicketDetailModal: React.FC<Props> = ({ show, ticketId, onClose, onRefresh
                   </div>
                 </div>
 
-                {/* Atribuído ao Técnico */}
+                {/* Atribuído ao Técnico (se aplicável) */}
                 {ticket.assignedAt && ticket.assignedTo && (
                   <div className="timeline-item">
                     <div className="timeline-marker"></div>
@@ -230,10 +244,12 @@ const TicketDetailModal: React.FC<Props> = ({ show, ticketId, onClose, onRefresh
             </div>
           </div>
         ) : (
+          // Caso não exista ticket (id inválido), mostrar mensagem
           <div className="text-center py-4 text-white">Ticket não encontrado</div>
         )}
       </Modal.Body>
       <Modal.Footer>
+        {/* Mostrar botão de atribuição se for técnico e ainda não estiver atribuído */}
         {user?.role === 'tech' && ticket && isNotAssigned && (
           <button
             onClick={() => setShowAssignModal(true)}
@@ -256,6 +272,8 @@ const TicketDetailModal: React.FC<Props> = ({ show, ticketId, onClose, onRefresh
             Atribuir
           </button>
         )}
+
+        {/* Mostrar botão de atualizar status se o chamado estiver atribuído ao usuário atual */}
         {user?.role === 'tech' && ticket && isAssignedToCurrentUser && (
           <button
             onClick={() => setShowStatusModal(true)}
@@ -283,7 +301,7 @@ const TicketDetailModal: React.FC<Props> = ({ show, ticketId, onClose, onRefresh
         </Button>
       </Modal.Footer>
 
-      {/* Modal de Atribuir */}
+      {/* Modais filhos: atribuição e atualização de status (renderizados condicionalmente) */}
       {ticket && (
         <>
           <AssignModal

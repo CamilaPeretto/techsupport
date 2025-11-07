@@ -1,18 +1,25 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import api from '../services/api';
 
+/*
+  ticketsSlice
+
+  - Types describing ticket domain objects and the shape of the tickets slice.
+  - Async thunks for server interactions (fetch, create, update status, assign).
+  - Reducers/extrareducers to keep local state in sync with server responses.
+*/
 export type TicketStatus = 'aberto' | 'em andamento' | 'concluído';
 export type TicketPriority = 'baixa' | 'média' | 'alta';
 export type TicketType = 'hardware' | 'software' | 'rede' | 'outros';
 
 export interface Ticket {
   _id: string;
-  ticketNumber?: number;
+  ticketNumber?: number; // sequence number generated server-side
   title: string;
   description?: string;
   status: TicketStatus;
-  userId: string;
-  assignedTo?: { _id: string; name: string; email: string } | null;
+  userId: string; // creator
+  assignedTo?: { _id: string; name: string; email: string } | null; // technician
   priority?: TicketPriority;
   type?: TicketType;
   createdAt: string;
@@ -33,6 +40,8 @@ const initialState: TicketsState = {
   selectedTicketId: null,
 };
 
+/* Fetch tickets optionally filtered by query params.
+   Returns the array of tickets from the backend. */
 export const fetchTickets = createAsyncThunk<
   Ticket[],
   | {
@@ -53,22 +62,25 @@ export const fetchTickets = createAsyncThunk<
   }
 );
 
-export const createTicket = createAsyncThunk<Ticket, { title: string; description?: string; userId: string; priority?: TicketPriority }>(
-  'tickets/create',
-  async (payload) => {
-    const { data } = await api.post<{ ticket: Ticket }>('/api/tickets', payload);
-    return data.ticket;
-  }
-);
+/* Create a new ticket on the server and return the created ticket */
+export const createTicket = createAsyncThunk<
+  Ticket,
+  { title: string; description?: string; userId: string; priority?: TicketPriority }
+>('tickets/create', async (payload) => {
+  const { data } = await api.post<{ ticket: Ticket }>('/api/tickets', payload);
+  return data.ticket;
+});
 
-export const updateTicketStatus = createAsyncThunk<Ticket, { id: string; status: TicketStatus; resolution?: string }>(
-  'tickets/updateStatus',
-  async ({ id, status, resolution }) => {
-    const { data } = await api.put<{ ticket: Ticket }>(`/api/tickets/${id}/status`, { status, resolution });
-    return data.ticket;
-  }
-);
+/* Update ticket status (e.g., aberto -> em andamento -> concluído). */
+export const updateTicketStatus = createAsyncThunk<
+  Ticket,
+  { id: string; status: TicketStatus; resolution?: string }
+>('tickets/updateStatus', async ({ id, status, resolution }) => {
+  const { data } = await api.put<{ ticket: Ticket }>(`/api/tickets/${id}/status`, { status, resolution });
+  return data.ticket;
+});
 
+/* Assign a technician to a ticket. */
 export const assignTicket = createAsyncThunk<Ticket, { id: string; assignedTo: string }>(
   'tickets/assign',
   async ({ id, assignedTo }) => {
@@ -81,12 +93,14 @@ const ticketsSlice = createSlice({
   name: 'tickets',
   initialState,
   reducers: {
+    // Local UI helper to set which ticket is selected in the UI
     setSelectedTicketId: (state, action: PayloadAction<string | null>) => {
       state.selectedTicketId = action.payload;
     },
   },
   extraReducers: (builder) => {
     builder
+      // fetchTickets
       .addCase(fetchTickets.pending, (state) => {
         state.loading = true; state.error = null;
       })
@@ -97,15 +111,18 @@ const ticketsSlice = createSlice({
         state.loading = false; state.error = action.error.message || 'Erro ao carregar tickets';
       })
 
+      // createTicket: add the newly created ticket at the front of the list
       .addCase(createTicket.fulfilled, (state, action) => {
         state.items.unshift(action.payload);
       })
 
+      // updateTicketStatus: replace the item with newest server copy
       .addCase(updateTicketStatus.fulfilled, (state, action) => {
         const idx = state.items.findIndex(t => t._id === action.payload._id);
         if (idx >= 0) state.items[idx] = action.payload;
       })
 
+      // assignTicket: replace the updated ticket from server response
       .addCase(assignTicket.fulfilled, (state, action) => {
         const idx = state.items.findIndex(t => t._id === action.payload._id);
         if (idx >= 0) state.items[idx] = action.payload;
