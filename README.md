@@ -61,6 +61,9 @@ techsupport/
 │   ├── package.json
 │   ├── tsconfig.json
 │   ├── .env                
+│   ├── docs/               # documentação gerada/manual
+│   │   ├── API.md          # documentação em português
+│   │   └── openapi.json    # snapshot do OpenAPI (opcional)
 │   └── src/
 │       ├── app.ts
 │       ├── server.ts
@@ -150,7 +153,7 @@ techsupport/
             └── ticketsSlice.ts
 ```
 
-## Rápido: como rodar (desenvolvimento)
+## Como rodar (desenvolvimento)
 
 1) Instalar dependências
 
@@ -176,6 +179,17 @@ cd backend && npm run dev
 cd frontend && npm run dev
 ```
 
+Visualizar documentação da API
+-----------------------------
+
+Após iniciar o backend, a documentação gerada está disponível em duas formas:
+
+- Swagger UI (interativa): http://localhost:5000/api/docs
+- Spec OpenAPI (JSON): http://localhost:5000/api/docs.json
+- Documento em português (arquivo): `backend/docs/API.md`
+
+Esses recursos permitem importar a spec em ferramentas como Postman ou Insomnia e testar endpoints diretamente pela UI do Swagger.
+
 3) Build de produção
 
 ```bash
@@ -192,26 +206,6 @@ PORT=5000
 MONGO_URI=your_mongo_connection_string
 JWT_SECRET=your_jwt_secret
 ```
-
-## API — endpoints principais
-
-Autenticação
-- POST /api/register — criar usuário (role `user` por padrão)
-- POST /api/login — autenticar e obter token
-- GET /api/me — obter usuário autenticado
-
-Usuários (protegido)
-- GET /api/users
-- GET /api/users/:id
-- PUT /api/users/:id
-
-Tickets (requer Authorization: Bearer <token>)
-- POST /api/tickets — criar ticket (user, tech)
-- GET /api/tickets — listar (user: próprios / tech: todos)
-- GET /api/tickets/:id — detalhes
-- PUT /api/tickets/:id/status — atualizar status (tech)
-- PUT /api/tickets/:id/assign — atribuir (tech)
-- DELETE /api/tickets/:id — deletar (tech)
 
 ## Design
 

@@ -1,0 +1,13 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "TechSupport API",
+    "version": "1.0.0",
+    "description": "Especificação OpenAPI gerada automaticamente (snapshot)."
+  },
+  "servers": [
+    { "url": "http://localhost:5000", "description": "Servidor local" }
+  ],
+  "paths": {},
+  "components": {}
+}

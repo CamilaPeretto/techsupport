@@ -15,6 +15,8 @@ import userRoutes from "./routes/userRoutes";
 import ticketRoutes from "./routes/ticketRoutes";
 // Middleware de autenticação (verifica JWT no header)
 import auth from "./middleware/auth";
+// Swagger/OpenAPI
+import { swaggerUi, swaggerSpec } from "./swagger";
 
 // Carrega variáveis de ambiente (ex: PORT, JWT_SECRET, credenciais DB)
 dotenv.config();
@@ -48,6 +50,14 @@ app.use("/api", userRoutes);
 // Rotas de tickets protegidas por middleware de auth (checa JWT)
 // Observação: auth valida o token presente em Authorization: Bearer <token>
 app.use("/api/tickets", auth, ticketRoutes);
+
+// Rota para documentação Swagger UI
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+// Rota para retornar o spec OpenAPI (JSON) — útil para importação em Postman/Insomnia
+app.get('/api/docs.json', (_req, res) => {
+  res.json(swaggerSpec);
+});
 
 // Rota raiz apenas para healthcheck / verificação rápida
 app.get("/", (_req: Request, res: Response) => {
